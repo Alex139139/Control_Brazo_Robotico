@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="76dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:hint="@string/txt_num_Grados_String"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/button1m"
+        app:layout_constraintEnd_toStartOf="@+id/button1p"
+        app:layout_constraintStart_toEndOf="@+id/button1m"
+        app:layout_constraintTop_toTopOf="@+id/button1m"
+        tools:targetApi="o" />
+
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="76dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="100"
+        android:hint="@string/txt_num_Grados_String"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/button2m"
+        app:layout_constraintEnd_toStartOf="@+id/button2p"
+        app:layout_constraintStart_toEndOf="@+id/button2m"
+        app:layout_constraintTop_toTopOf="@+id/button2m"
+        tools:targetApi="o" />
+
+    <EditText
+        android:id="@+id/editText3"
+        android:layout_width="76dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:hint="@string/txt_num_Grados_String"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/button3m"
+        app:layout_constraintEnd_toStartOf="@+id/button3p"
+        app:layout_constraintStart_toEndOf="@+id/button3m"
+        app:layout_constraintTop_toTopOf="@+id/button3m"
+        tools:targetApi="o" />
+
+    <EditText
+        android:id="@+id/editText4"
+        android:layout_width="76dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:hint="@string/txt_num_Grados_String"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/button4m"
+        app:layout_constraintEnd_toStartOf="@+id/button4p"
+        app:layout_constraintStart_toEndOf="@+id/button4m"
+        app:layout_constraintTop_toTopOf="@+id/button4m"
+        tools:targetApi="o" />
+
+    <EditText
+        android:id="@+id/editText5"
+        android:layout_width="76dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:hint="@string/txt_num_Grados_String"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/button5m"
+        app:layout_constraintEnd_toStartOf="@+id/button5p"
+        app:layout_constraintStart_toEndOf="@+id/button5m"
+        app:layout_constraintTop_toTopOf="@+id/button5m"
+        tools:targetApi="o" />
+
+    <EditText
+        android:id="@+id/editText6"
+        android:layout_width="76dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:hint="@string/txt_num_Grados_String"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/button6m"
+        app:layout_constraintEnd_toStartOf="@+id/button6p"
+        app:layout_constraintStart_toEndOf="@+id/button6m"
+        app:layout_constraintTop_toTopOf="@+id/button6m"
+        tools:targetApi="o" />
+
+    <Button
+        android:id="@+id/button1p"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/button_Suma_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/editText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editText" />
+
+    <Button
+        android:id="@+id/button2p"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/button_Suma_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/editText2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editText2"
+        app:layout_constraintVertical_bias="0.454" />
+
+    <Button
+        android:id="@+id/button3p"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/button_Suma_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/editText3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editText3" />
+
+    <Button
+        android:id="@+id/button4p"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/button_Suma_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/editText4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editText4" />
+
+    <Button
+        android:id="@+id/button5p"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/button_Suma_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/editText5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editText5" />
+
+    <Button
+        android:id="@+id/button6p"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/button_Suma_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/editText6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editText6" />
+
+    <Switch
+        android:id="@+id/switch_Motor1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
+        android:text="@string/switch_motor1_String"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Switch
+        android:id="@+id/switch_Motor2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="45dp"
+        android:text="@string/switch_motor2_String"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_Motor1" />
+
+    <Switch
+        android:id="@+id/switch_Motor3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="45dp"
+        android:text="@string/switch_motor3_String"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_Motor2" />
+
+    <Switch
+        android:id="@+id/switch_Motor4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="45dp"
+        android:text="@string/switch_motor4_String"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_Motor3" />
+
+    <Switch
+        android:id="@+id/switch_Motor5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="45dp"
+        android:text="@string/switch_motor5_String"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_Motor4" />
+
+    <Switch
+        android:id="@+id/switch_Motor6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="45dp"
+        android:text="@string/switch_motor6_String"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_Motor5" />
+
+    <Button
+        android:id="@+id/button1m"
+        style="@android:style/Widget.Material.Light.Button.Small"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="30dp"
+        android:text="@string/button_Resta_Grados_String"
+        android:onClick="Control_OnOff"
+        app:layout_constraintBottom_toBottomOf="@+id/switch_Motor1"
+        app:layout_constraintStart_toEndOf="@+id/switch_Motor1"
+        app:layout_constraintTop_toTopOf="@+id/switch_Motor1" />
+
+    <Button
+        android:id="@+id/button2m"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="30dp"
+        android:text="@string/button_Resta_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/switch_Motor2"
+        app:layout_constraintStart_toEndOf="@+id/switch_Motor2"
+        app:layout_constraintTop_toTopOf="@+id/switch_Motor2" />
+
+    <Button
+        android:id="@+id/button3m"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="30dp"
+        android:text="@string/button_Resta_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/switch_Motor3"
+        app:layout_constraintStart_toEndOf="@+id/switch_Motor3"
+        app:layout_constraintTop_toTopOf="@+id/switch_Motor3" />
+
+    <Button
+        android:id="@+id/button4m"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="30dp"
+        android:text="@string/button_Resta_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/switch_Motor4"
+        app:layout_constraintStart_toEndOf="@+id/switch_Motor4"
+        app:layout_constraintTop_toTopOf="@+id/switch_Motor4" />
+
+    <Button
+        android:id="@+id/button5m"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="30dp"
+        android:text="@string/button_Resta_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/switch_Motor5"
+        app:layout_constraintStart_toEndOf="@+id/switch_Motor5"
+        app:layout_constraintTop_toTopOf="@+id/switch_Motor5" />
+
+    <Button
+        android:id="@+id/button6m"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="30dp"
+        android:text="@string/button_Resta_Grados_String"
+        app:layout_constraintBottom_toBottomOf="@+id/switch_Motor6"
+        app:layout_constraintStart_toEndOf="@+id/switch_Motor6"
+        app:layout_constraintTop_toTopOf="@+id/switch_Motor6" />
+
+    <TextView
+        android:id="@+id/status_M1"
+        android:layout_width="88dp"
+        android:layout_height="57dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginBottom="40dp"
+        android:text="@string/txt_view_Estado_M1"
+        android:textAlignment="textStart"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Control Brazo Robotico</string>
+    <string name="switch_motor1_String">Motor1</string>
+    <string name="switch_motor2_String">Motor2</string>
+    <string name="switch_motor3_String">Motor3</string>
+    <string name="switch_motor4_String">Motor4</string>
+    <string name="switch_motor5_String">Motor5</string>
+    <string name="switch_motor6_String">Motor6</string>
+    <string name="button_Resta_Grados_String">-</string>
+    <string name="button_Suma_Grados_String">+</string>
+    <string name="txt_num_Grados_String">0-180</string>
+    <string name="txt_view_Estado_M1">M1</string>
+</resources>
