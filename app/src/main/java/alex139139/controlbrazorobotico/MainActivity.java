@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         Motor_On_Off(switch_M3);
         Motor_On_Off(switch_M4);
         Motor_On_Off(switch_M5);
-        Motor_On_Off(switch_M6);
+        //Motor_On_Off(switch_M6);
 
 
 
