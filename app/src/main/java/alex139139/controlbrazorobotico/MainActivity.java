@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_plus_M5 = (Button)findViewById(R.id.button5p);
         button_plus_M6 = (Button)findViewById(R.id.button6p);
 
-        txtView_Estado_M1 = (TextView)findViewById(R.id.status_M1);
+
 
         Motor_On_Off(switch_M1);
         Motor_On_Off(switch_M2);
@@ -98,10 +98,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
+
     }
     //metodos Para sumar o restar grados
 
-    public void Control_OnOff(View view){
+/*    public void Control_OnOff(View view){
 
         int valorGrados_M1_int= 0;
         String valorGrados_M1_String = String.valueOf(valorGrados_M1_int);
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         valorGrados_M1_int = Integer.parseInt(valorGrados_M1_String);
         txtView_Estado_M1.setText(valorGrados_M1_String);
 
-    }
+    }*/
     public void Motor_On_Off(Switch switch_M){
 
         switch_M.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -142,37 +143,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button2m:
-
+                Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button3m:
-
+                Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button4m:
-
+                Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button5m:
-
+                Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button6m:
-
+                Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button1p:
-
+                Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button2p:
-
+                Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button3p:
-
+                Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button4p:
-
+                Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button5p:
-
+                Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button6p:
-
+                Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
                 break;
 
         }
