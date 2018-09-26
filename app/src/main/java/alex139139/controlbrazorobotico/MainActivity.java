@@ -10,7 +10,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Switch switch_M1;
     private Switch switch_M2;
@@ -83,7 +83,18 @@ public class MainActivity extends AppCompatActivity {
         Motor_On_Off(switch_M3);
         Motor_On_Off(switch_M4);
         Motor_On_Off(switch_M5);
-        //Motor_On_Off(switch_M6);
+        Motor_On_Off(switch_M6);
+
+        button_plus_M1.setOnClickListener(this);
+        button_plus_M2.setOnClickListener(this);
+        button_plus_M3.setOnClickListener(this);
+        button_plus_M4.setOnClickListener(this);
+        button_plus_M5.setOnClickListener(this);
+        button_plus_M6.setOnClickListener(this);
+
+
+
+
 
 
 
@@ -116,11 +127,59 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }//Cierre de la funcion Motor_On_Off
-
+/*
     public void sumar_Grados(View view ){
         //button_plus_M.hasOnClickListeners();
 
 
-    }
+    }*/
 
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+
+            case R.id.button1m:
+                Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.button2m:
+
+                break;
+            case R.id.button3m:
+
+                break;
+            case R.id.button4m:
+
+                break;
+            case R.id.button5m:
+
+                break;
+            case R.id.button6m:
+
+                break;
+            case R.id.button1p:
+
+                break;
+            case R.id.button2p:
+
+                break;
+            case R.id.button3p:
+
+                break;
+            case R.id.button4p:
+
+                break;
+            case R.id.button5p:
+
+                break;
+            case R.id.button6p:
+
+                break;
+
+        }
+
+
+
+
+
+    }
 }

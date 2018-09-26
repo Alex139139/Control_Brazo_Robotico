@@ -302,7 +302,7 @@
         android:layout_width="88dp"
         android:layout_height="57dp"
         android:layout_marginStart="48dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="4dp"
         android:text="@string/txt_view_Estado_M1"
         android:textAlignment="textStart"
         android:textSize="24sp"
