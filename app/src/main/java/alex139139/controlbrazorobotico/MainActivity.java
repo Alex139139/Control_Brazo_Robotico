@@ -92,6 +92,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_plus_M5.setOnClickListener(this);
         button_plus_M6.setOnClickListener(this);
 
+        button_less_M1.setOnClickListener(this);
+        button_less_M2.setOnClickListener(this);
+        button_less_M3.setOnClickListener(this);
+        button_less_M4.setOnClickListener(this);
+        button_less_M5.setOnClickListener(this);
+        button_less_M6.setOnClickListener(this);
+
 
 
 
@@ -143,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button2m:
-                Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "-1,2", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button3m:
                 Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
