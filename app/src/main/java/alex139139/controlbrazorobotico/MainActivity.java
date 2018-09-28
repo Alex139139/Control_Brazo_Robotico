@@ -180,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.button1p:
                // Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
+
                 sumaGrados(editText_M1,GradosMotor_StringM1);
                 break;
             case R.id.button2p:
@@ -200,25 +201,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }//Cierre Funcion onClick
 
-    public void sumaGrados (EditText editText_M, String GradosMotor_StringM){
-        String GradosMotor_String = editText_M.getText().toString();
+    public void sumaGrados (EditText editText_M, String GradosMotor_String){
+        GradosMotor_String = editText_M.getText().toString();
         int GradosMotor_int;
-        int Flag =0;
 
         if(editText_M.getText().toString().isEmpty()){
-            if(Flag == 0){
-                editText_M.setText(GradosMotor_StringM);
-            }else{
-                Flag = 1;
-                GradosMotor_int =Integer.parseInt(GradosMotor_String);
-                GradosMotor_String = String.valueOf(GradosMotor_int);
-                editText_M.setText(GradosMotor_String);
-            }
+            editText_M.setText(GradosMotor_String);
 
         }else{
             GradosMotor_int =Integer.parseInt(GradosMotor_String);
-            if(GradosMotor_int >= 180 || GradosMotor_int < 0){
-                //editText_M.setText(GradosMotor_String);
+
+            if(editText_M.getText().toString().isEmpty()){
+                editText_M.setText(GradosMotor_String);
 
             }else if (GradosMotor_int < 180){
                 GradosMotor_int ++;
@@ -231,15 +225,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void restaGrados (EditText editText_M,String GradosMotor_StringM ){
         String GradosMotor_String = editText_M.getText().toString();
-        int GradosMotor_int =0;
+        int GradosMotor_int;
 
         if(editText_M.getText().toString().isEmpty()){
-            if(GradosMotor_int == 0){
-                editText_M.setText(GradosMotor_StringM);
-            }else{
-                GradosMotor_String = String.valueOf(GradosMotor_int);
-                editText_M.setText(GradosMotor_String);
-            }
+
         }else{
             GradosMotor_int =Integer.parseInt(GradosMotor_String);
             if(GradosMotor_int < 0){
