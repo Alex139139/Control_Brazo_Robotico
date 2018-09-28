@@ -10,4 +10,5 @@
     <string name="button_Suma_Grados_String">+</string>
     <string name="txt_num_Grados_String">0-180</string>
     <string name="txt_view_Estado_M1">M1</string>
+    <string name="txt_num_Grados_PorDefecto_String">90</string>
 </resources>

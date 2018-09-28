@@ -12,6 +12,14 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    String GradosMotor_StringM1 = "179";
+    String GradosMotor_StringM2 = "80";
+    String GradosMotor_StringM3 = "50";
+    String GradosMotor_StringM4 = "0";
+    String GradosMotor_StringM5 = "40";
+    String GradosMotor_StringM6 = "20";
+
+
     private Switch switch_M1;
     private Switch switch_M2;
     private Switch switch_M3;
@@ -40,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button button_plus_M5;
     private Button button_plus_M6;
 
-    private TextView txtView_Estado_M1;
+    private int GradosM1= 90;
 
 
     @Override
@@ -85,35 +93,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Motor_On_Off(switch_M5);
         Motor_On_Off(switch_M6);
 
-        button_plus_M1.setOnClickListener(this);
-        button_plus_M2.setOnClickListener(this);
-        button_plus_M3.setOnClickListener(this);
-        button_plus_M4.setOnClickListener(this);
-        button_plus_M5.setOnClickListener(this);
-        button_plus_M6.setOnClickListener(this);
 
-        button_less_M1.setOnClickListener(this);
-        button_less_M2.setOnClickListener(this);
-        button_less_M3.setOnClickListener(this);
-        button_less_M4.setOnClickListener(this);
-        button_less_M5.setOnClickListener(this);
-        button_less_M6.setOnClickListener(this);
+        button_plus_M1.setOnClickListener(MainActivity.this);
+        button_plus_M2.setOnClickListener(MainActivity.this);
+        button_plus_M3.setOnClickListener(MainActivity.this);
+        button_plus_M4.setOnClickListener(MainActivity.this);
+        button_plus_M5.setOnClickListener(MainActivity.this);
+        button_plus_M6.setOnClickListener(MainActivity.this);
 
-
-
+        button_less_M1.setOnClickListener(MainActivity.this);
+        button_less_M2.setOnClickListener(MainActivity.this);
+        button_less_M3.setOnClickListener(MainActivity.this);
+        button_less_M4.setOnClickListener(MainActivity.this);
+        button_less_M5.setOnClickListener(MainActivity.this);
+        button_less_M6.setOnClickListener(MainActivity.this);
 
 
 
+        editText_M1.setText(GradosMotor_StringM1);
+        editText_M2.setText(GradosMotor_StringM2);
+        editText_M3.setText(GradosMotor_StringM3);
+        editText_M4.setText(GradosMotor_StringM4);
+        editText_M5.setText(GradosMotor_StringM5);
+        editText_M6.setText(GradosMotor_StringM6);
 
 
-    }
+
+
+
+
+
+
+    }//Cierre Funcion onCreate
     //metodos Para sumar o restar grados
 
 /*    public void Control_OnOff(View view){
 
         int valorGrados_M1_int= 0;
         String valorGrados_M1_String = String.valueOf(valorGrados_M1_int);
-        //String valorGrados_M1_String = editText_M1.getText().toString();
+        String valorGrados_M1_String = editText_M1.getText().toString();
         valorGrados_M1_int = Integer.parseInt(valorGrados_M1_String);
         txtView_Estado_M1.setText(valorGrados_M1_String);
 
@@ -128,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     Toast.makeText(MainActivity.this, "Motor encendido", Toast.LENGTH_SHORT).show();
 
+
                 }else{
                     Toast.makeText(MainActivity.this, "Motor apagado", Toast.LENGTH_SHORT).show();
                 }
@@ -135,19 +154,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
     }//Cierre de la funcion Motor_On_Off
-/*
-    public void sumar_Grados(View view ){
-        //button_plus_M.hasOnClickListeners();
-
-
-    }*/
 
     @Override
     public void onClick(View v) {
         switch(v.getId()){
 
             case R.id.button1m:
-                Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
+                restaGrados(editText_M1,GradosMotor_StringM1);
                 break;
             case R.id.button2m:
                 Toast.makeText(MainActivity.this, "-1,2", Toast.LENGTH_SHORT).show();
@@ -165,7 +179,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.button1p:
-                Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
+                sumaGrados(editText_M1,GradosMotor_StringM1);
                 break;
             case R.id.button2p:
                 Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
@@ -182,12 +197,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.button6p:
                 Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
                 break;
-
         }
+    }//Cierre Funcion onClick
 
+    public void sumaGrados (EditText editText_M, String GradosMotor_StringM){
+        String GradosMotor_String = editText_M.getText().toString();
+        int GradosMotor_int;
+        int Flag =0;
 
+        if(editText_M.getText().toString().isEmpty()){
+            if(Flag == 0){
+                editText_M.setText(GradosMotor_StringM);
+            }else{
+                Flag = 1;
+                GradosMotor_int =Integer.parseInt(GradosMotor_String);
+                GradosMotor_String = String.valueOf(GradosMotor_int);
+                editText_M.setText(GradosMotor_String);
+            }
 
+        }else{
+            GradosMotor_int =Integer.parseInt(GradosMotor_String);
+            if(GradosMotor_int >= 180 || GradosMotor_int < 0){
+                //editText_M.setText(GradosMotor_String);
 
-
+            }else if (GradosMotor_int < 180){
+                GradosMotor_int ++;
+                //editText_M.setText(GradosMotor_String);
+                GradosMotor_String = String.valueOf(GradosMotor_int);
+                editText_M.setText(GradosMotor_String);
+            }
+        }
     }
+
+    public void restaGrados (EditText editText_M,String GradosMotor_StringM ){
+        String GradosMotor_String = editText_M.getText().toString();
+        int GradosMotor_int =0;
+
+        if(editText_M.getText().toString().isEmpty()){
+            if(GradosMotor_int == 0){
+                editText_M.setText(GradosMotor_StringM);
+            }else{
+                GradosMotor_String = String.valueOf(GradosMotor_int);
+                editText_M.setText(GradosMotor_String);
+            }
+        }else{
+            GradosMotor_int =Integer.parseInt(GradosMotor_String);
+            if(GradosMotor_int < 0){
+                //editText_M.setText(GradosMotor_String);
+            }else if(GradosMotor_int > 0){
+                GradosMotor_int --;
+                //editText_M.setText(GradosMotor_String);
+                GradosMotor_String = String.valueOf(GradosMotor_int);
+                editText_M.setText(GradosMotor_String);
+            }
+        }
+    }
+
+
+
+
 }
+
+
+
