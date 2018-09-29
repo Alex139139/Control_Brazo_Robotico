@@ -137,15 +137,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }//Cierre Funcion onCreate
     //metodos Para sumar o restar grados
 
-/*    public void Control_OnOff(View view){
+    /*    public void Control_OnOff(View view){
 
-        int valorGrados_M1_int= 0;
-        String valorGrados_M1_String = String.valueOf(valorGrados_M1_int);
-        String valorGrados_M1_String = editText_M1.getText().toString();
-        valorGrados_M1_int = Integer.parseInt(valorGrados_M1_String);
-        txtView_Estado_M1.setText(valorGrados_M1_String);
+            int valorGrados_M1_int= 0;
+            String valorGrados_M1_String = String.valueOf(valorGrados_M1_int);
+            String valorGrados_M1_String = editText_M1.getText().toString();
+            valorGrados_M1_int = Integer.parseInt(valorGrados_M1_String);
+            txtView_Estado_M1.setText(valorGrados_M1_String);
 
-    }*/
+        }*/
     public void Motor_On_Off(Switch switch_M){
 
         switch_M.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 GradosMotor_intM6=restaGrados(editText_M6,GradosMotor_StringM6,GradosMotor_intM6);
                 break;
             case R.id.button1p:
-               // Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
                 GradosMotor_intM1=sumaGrados(editText_M1,GradosMotor_StringM1,GradosMotor_intM1);
                 break;
             case R.id.button2p:
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         if(editText_M.getText().toString().isEmpty()){
-            if (GradosMotor_intM == Integer.parseInt(GradosMotor_StringM)) {
+            if(GradosMotor_intM == Integer.parseInt(GradosMotor_StringM)) {
                 editText_M.setText(GradosMotor_StringM);
             }else{
                 GradosMotor_String = String.valueOf(GradosMotor_intM);
