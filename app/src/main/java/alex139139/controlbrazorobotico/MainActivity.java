@@ -26,8 +26,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int GradosMotor_intM5 = 180;
     private int GradosMotor_intM6 = 90;
 
-
-
     private Switch switch_M1;
     private Switch switch_M2;
     private Switch switch_M3;
@@ -55,8 +53,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button button_plus_M4;
     private Button button_plus_M5;
     private Button button_plus_M6;
-
-    private int GradosM1= 90;
 
 
     @Override
@@ -92,8 +88,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_plus_M5 = (Button)findViewById(R.id.button5p);
         button_plus_M6 = (Button)findViewById(R.id.button6p);
 
-
-
         Motor_On_Off(switch_M1);
         Motor_On_Off(switch_M2);
         Motor_On_Off(switch_M3);
@@ -123,29 +117,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_less_M5.setOnClickListener(MainActivity.this);
         button_less_M6.setOnClickListener(MainActivity.this);
 
-
-
-
-
-
-
-
-
-
-
-
     }//Cierre Funcion onCreate
+
+
     //metodos Para sumar o restar grados
 
-    /*    public void Control_OnOff(View view){
-
-            int valorGrados_M1_int= 0;
-            String valorGrados_M1_String = String.valueOf(valorGrados_M1_int);
-            String valorGrados_M1_String = editText_M1.getText().toString();
-            valorGrados_M1_int = Integer.parseInt(valorGrados_M1_String);
-            txtView_Estado_M1.setText(valorGrados_M1_String);
-
-        }*/
     public void Motor_On_Off(Switch switch_M){
 
         switch_M.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
