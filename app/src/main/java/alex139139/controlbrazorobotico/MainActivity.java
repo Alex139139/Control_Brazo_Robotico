@@ -10,9 +10,8 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import java.lang.annotation.Repeatable;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener,View.OnTouchListener {
+public class MainActivity extends AppCompatActivity implements View.OnLongClickListener,View.OnTouchListener {
 
     private String GradosMotor_StringM1 = "179";
     private String GradosMotor_StringM2 = "80";
@@ -56,6 +55,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button button_plus_M5;
     private Button button_plus_M6;
 
+    private boolean AutoIncrement_boolean1 = false; //Incrementar
+    private boolean AutoIncrement_boolean2 = false;
+    private boolean AutoIncrement_boolean3 = false;
+    private boolean AutoIncrement_boolean4= false;
+    private boolean AutoIncrement_boolean5 = false;
+    private boolean AutoIncrement_boolean6= false;
+
+    private boolean AutoDecrement_boolean1 = false; //Reducir
+    private boolean AutoDecrement_boolean2 = false;
+    private boolean AutoDecrement_boolean3 = false;
+    private boolean AutoDecrement_boolean4 = false;
+    private boolean AutoDecrement_boolean5 = false;
+    private boolean AutoDecrement_boolean6 = false;
+
 
 
     private Handler handlerRepetir= new Handler();
@@ -91,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_plus_M3 = (Button)findViewById(R.id.button3p);
         button_plus_M4 = (Button)findViewById(R.id.button4p);
         button_plus_M5 = (Button)findViewById(R.id.button5p);
-        button_plus_M6 = (Button)findViewById(R.id.button6p);
+        button_plus_M6 = findViewById(R.id.button6p);
 
 
         editText_M1.setText(GradosMotor_StringM1);
@@ -101,38 +114,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editText_M5.setText(GradosMotor_StringM5);
         editText_M6.setText(GradosMotor_StringM6);
 
+        button_less_M1.setOnTouchListener(this);
+        button_less_M2.setOnTouchListener(this);
+        button_less_M3.setOnTouchListener(this);
+        button_less_M4.setOnTouchListener(this);
+        button_less_M5.setOnTouchListener(this);
+        button_less_M6.setOnTouchListener(this);
 
-        button_plus_M1.setOnClickListener(this);
-        button_plus_M2.setOnClickListener(this);
-        button_plus_M3.setOnClickListener(this);
-        button_plus_M4.setOnClickListener(this);
-        button_plus_M5.setOnClickListener(this);
-        button_plus_M6.setOnClickListener(this);
+        button_plus_M1.setOnTouchListener(this);
+        button_plus_M2.setOnTouchListener(this);
+        button_plus_M3.setOnTouchListener(this);
+        button_plus_M4.setOnTouchListener(this);
+        button_plus_M5.setOnTouchListener(this);
+        button_plus_M6.setOnTouchListener(this);
 
-        button_less_M1.setOnClickListener(this);
-        button_less_M2.setOnClickListener(this);
-        button_less_M3.setOnClickListener(this);
-        button_less_M4.setOnClickListener(this);
-        button_less_M5.setOnClickListener(this);
-        button_less_M6.setOnClickListener(this);
 
-        /*button_plus_M1.setOnLongClickListener(MainActivity.this);
-        button_plus_M2.setOnLongClickListener(MainActivity.this);
-        button_plus_M3.setOnLongClickListener(MainActivity.this);
-        button_plus_M4.setOnLongClickListener(MainActivity.this);
-        button_plus_M5.setOnLongClickListener(MainActivity.this);
-        button_plus_M6.setOnLongClickListener(MainActivity.this);
 
-        button_less_M1.setOnLongClickListener(MainActivity.this);
-        button_less_M2.setOnLongClickListener(MainActivity.this);
-        button_less_M3.setOnLongClickListener(MainActivity.this);
-        button_less_M4.setOnLongClickListener(MainActivity.this);
-        button_less_M5.setOnLongClickListener(MainActivity.this);
-        button_less_M6.setOnLongClickListener(MainActivity.this);
-        button_less_M1.setOnLongClickListener(MainActivity.this);*/
+        button_plus_M1.setOnLongClickListener(this);
+        button_plus_M2.setOnLongClickListener(this);
+        button_plus_M3.setOnLongClickListener(this);
+        button_plus_M4.setOnLongClickListener(this);
+        button_plus_M5.setOnLongClickListener(this);
+        button_plus_M6.setOnLongClickListener(this);
 
-        //button_less_M1.setOnTouchListener(this);
-        //button_plus_M1.setOnTouchListener(this);
+        button_less_M1.setOnLongClickListener(this);
+        button_less_M2.setOnLongClickListener(this);
+        button_less_M3.setOnLongClickListener(this);
+        button_less_M4.setOnLongClickListener(this);
+        button_less_M5.setOnLongClickListener(this);
+        button_less_M6.setOnLongClickListener(this);
+        button_less_M1.setOnLongClickListener(this);
+
+
+
+
+
 
     }//Cierre Funcion onCreate
 
@@ -141,81 +157,192 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
+
+
     @Override
-    public void onClick(View v) {
+    public boolean onLongClick(View v) {
         switch(v.getId()){
 
             case R.id.button1m:
-                //Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
-                comprobarTextEdit(editText_M1,GradosMotor_StringM1,GradosMotor_intM1);
-                GradosMotor_intM1 = restaGrados(GradosMotor_intM1,editText_M1);
-
+                AutoDecrement_boolean1 =true;
+                handlerRepetir.post(new handlerRepetir_class_Resta());
                 break;
             case R.id.button2m:
-                //Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
-                //GradosMotor_intM2=restaGrados(editText_M2,GradosMotor_StringM2,GradosMotor_intM2);
+                AutoDecrement_boolean2 =true;
+                handlerRepetir.post(new handlerRepetir_class_Resta());
                 break;
             case R.id.button3m:
-                //Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
-                //GradosMotor_intM3=restaGrados(editText_M3,GradosMotor_StringM3,GradosMotor_intM3);
+                AutoDecrement_boolean3 =true;
+                handlerRepetir.post(new handlerRepetir_class_Resta());
                 break;
             case R.id.button4m:
-                //Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
-                //GradosMotor_intM4=restaGrados(editText_M4,GradosMotor_StringM4,GradosMotor_intM4);
+                AutoDecrement_boolean4 =true;
+                handlerRepetir.post(new handlerRepetir_class_Resta());
                 break;
             case R.id.button5m:
-                //Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
-                //GradosMotor_intM5=restaGrados(editText_M5,GradosMotor_StringM5,GradosMotor_intM5);
+                AutoDecrement_boolean5 =true;
+                handlerRepetir.post(new handlerRepetir_class_Resta());
                 break;
             case R.id.button6m:
-                //Toast.makeText(MainActivity.this, "-1", Toast.LENGTH_SHORT).show();
-                //GradosMotor_intM6=restaGrados(editText_M6,GradosMotor_StringM6,GradosMotor_intM6);
+                AutoDecrement_boolean6 =true;
+                handlerRepetir.post(new handlerRepetir_class_Resta());
                 break;
+
+            ///////////////////////////////////////////////
             case R.id.button1p:
-                // Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
-                GradosMotor_intM1=sumaGrados(editText_M1,GradosMotor_StringM1,GradosMotor_intM1);
+                AutoIncrement_boolean1 =true;
+                handlerRepetir.post(new handlerRepetir_class_Suma());
                 break;
             case R.id.button2p:
-                //Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
-                GradosMotor_intM2=sumaGrados(editText_M2,GradosMotor_StringM2,GradosMotor_intM2);
+                AutoIncrement_boolean2 =true;
+                handlerRepetir.post(new handlerRepetir_class_Suma());
                 break;
             case R.id.button3p:
-                //Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
-                GradosMotor_intM3=sumaGrados(editText_M3,GradosMotor_StringM3,GradosMotor_intM3);
+                AutoIncrement_boolean3 =true;
+                handlerRepetir.post(new handlerRepetir_class_Suma());
                 break;
             case R.id.button4p:
-                //Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
-                GradosMotor_intM4=sumaGrados(editText_M4,GradosMotor_StringM4,GradosMotor_intM4);
+                AutoIncrement_boolean4 =true;
+                handlerRepetir.post(new handlerRepetir_class_Suma());
                 break;
             case R.id.button5p:
-                //Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
-                GradosMotor_intM5=sumaGrados(editText_M5,GradosMotor_StringM5,GradosMotor_intM5);
+                AutoIncrement_boolean5 =true;
+                handlerRepetir.post(new handlerRepetir_class_Suma());
                 break;
             case R.id.button6p:
-                //Toast.makeText(MainActivity.this, "+1", Toast.LENGTH_SHORT).show();
-                GradosMotor_intM6=sumaGrados(editText_M6,GradosMotor_StringM6,GradosMotor_intM6);
+                AutoIncrement_boolean6 =true;
+                handlerRepetir.post(new handlerRepetir_class_Suma());
                 break;
         }
-    }//Cierre Funcion onClick
+        return false;
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch(v.getId()){
+
+            case R.id.button1m:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M1,GradosMotor_StringM1,GradosMotor_intM1);
+                    restaGrados(GradosMotor_intM1,editText_M1);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoDecrement_boolean1 = false;
+                }
+                break;
+            case R.id.button2m:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M2,GradosMotor_StringM2,GradosMotor_intM2);
+                    restaGrados(GradosMotor_intM2,editText_M2);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoDecrement_boolean2 = false;
+                }
+
+                break;
+            case R.id.button3m:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M3,GradosMotor_StringM3,GradosMotor_intM3);
+                    restaGrados(GradosMotor_intM3,editText_M3);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoDecrement_boolean3 = false;
+                }
+                break;
+            case R.id.button4m:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M4,GradosMotor_StringM4,GradosMotor_intM4);
+                    restaGrados(GradosMotor_intM4,editText_M4);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoDecrement_boolean4 = false;
+                }
+                break;
+            case R.id.button5m:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M5,GradosMotor_StringM5,GradosMotor_intM5);
+                    restaGrados(GradosMotor_intM5,editText_M5);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoDecrement_boolean5 = false;
+                }
+                break;
+            case R.id.button6m:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M6,GradosMotor_StringM6,GradosMotor_intM6);
+                    restaGrados(GradosMotor_intM6,editText_M6);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoDecrement_boolean6 = false;
+                }
+                break;
+
+             ///////////////////////////////////////////////
+            case R.id.button1p:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M1,GradosMotor_StringM1,GradosMotor_intM1);
+                    sumaGrados(GradosMotor_intM1,editText_M1);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoIncrement_boolean1 = false;
+                }
+                break;
+            case R.id.button2p:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M2,GradosMotor_StringM2,GradosMotor_intM2);
+                    sumaGrados(GradosMotor_intM2,editText_M2);
+                }else if(event.getAction() == MotionEvent.ACTION_UP) {
+                    AutoIncrement_boolean2 = false;
+                }
+                break;
+            case R.id.button3p:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M3,GradosMotor_StringM3,GradosMotor_intM3);
+                    sumaGrados(GradosMotor_intM3,editText_M3);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoIncrement_boolean3 = false;
+                }
+                break;
+            case R.id.button4p:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M4,GradosMotor_StringM4,GradosMotor_intM4);
+                    sumaGrados(GradosMotor_intM4,editText_M4);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoIncrement_boolean4 = false;
+                }
+                break;
+            case R.id.button5p:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M5,GradosMotor_StringM5,GradosMotor_intM5);
+                    sumaGrados(GradosMotor_intM5,editText_M5);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoIncrement_boolean5 = false;
+                }
+                break;
+            case R.id.button6p:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    comprobarTextEdit(editText_M6,GradosMotor_StringM6,GradosMotor_intM6);
+                    sumaGrados(GradosMotor_intM6,editText_M6);
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    AutoIncrement_boolean6 = false;
+                }
+                break;
+        }
+        return false;
+    }
 
 
-    public int sumaGrados (EditText editText_M, String GradosMotor_StringM ,int GradosMotor_intM){
+
+
+    public void sumaGrados (int GradosMotor_intM, EditText editText_M){
         GradosMotor_intM = Integer.parseInt(editText_M.getText().toString());
         if (GradosMotor_intM < 180 ){
             GradosMotor_intM ++;
         }
         editText_M.setText(String.valueOf(GradosMotor_intM));
-        return GradosMotor_intM;
     }
 
 
-    public int restaGrados (int GradosMotor_intM, EditText editText_M ){
+    public void restaGrados (int GradosMotor_intM, EditText editText_M ){
         GradosMotor_intM = Integer.parseInt(editText_M.getText().toString());
         if (GradosMotor_intM > 0 ){
             GradosMotor_intM --;
         }
         editText_M.setText(String.valueOf(GradosMotor_intM));
-        return GradosMotor_intM;
+
     }
 
     public void comprobarTextEdit(EditText editText_M, String GradosMotor_StringM , int GradosMotor_intM){
@@ -234,57 +361,79 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 GradosMotor_String = String.valueOf(GradosMotor_intM);
                 editText_M.setText(GradosMotor_String);
             }else if(Integer.parseInt(GradosMotor_String) > 0){
-                Toast.makeText(this,"Correcto",Toast.LENGTH_SHORT).show();
 
+            }
+        }
+    }
+
+    class handlerRepetir_class_Suma implements Runnable{
+        @Override
+        public void run() {
+            if(AutoIncrement_boolean1){
+                sumaGrados(GradosMotor_intM1,editText_M1);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+
+            if(AutoIncrement_boolean2){
+                sumaGrados(GradosMotor_intM2,editText_M2);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+
+            if(AutoIncrement_boolean3){
+                sumaGrados(GradosMotor_intM3,editText_M3);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }else
+
+            if(AutoIncrement_boolean4){
+                sumaGrados(GradosMotor_intM4,editText_M4);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+
+            if(AutoIncrement_boolean5){
+                sumaGrados(GradosMotor_intM5,editText_M5);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+
+            if(AutoIncrement_boolean6){
+                sumaGrados(GradosMotor_intM6,editText_M6);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+        }
+    }
+
+    class handlerRepetir_class_Resta implements Runnable{
+
+        @Override
+        public void run() {
+            if (AutoDecrement_boolean1){
+                restaGrados(GradosMotor_intM1,editText_M1);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+            if (AutoDecrement_boolean2){
+                restaGrados(GradosMotor_intM2,editText_M2);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+            if (AutoDecrement_boolean3){
+                restaGrados(GradosMotor_intM3,editText_M3);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+            if (AutoDecrement_boolean4){
+                restaGrados(GradosMotor_intM4,editText_M4);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+            if (AutoDecrement_boolean5){
+                restaGrados(GradosMotor_intM5,editText_M5);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+            }
+            if (AutoDecrement_boolean6){
+                restaGrados(GradosMotor_intM6,editText_M6);
+                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
 
         }
     }
 
-    public void bucleFuncion(){
 
-    }
-    @Override
-    public boolean onLongClick(View v) {
-
-        return false;
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-/*        switch(v.getId()) {
-
-            case R.id.button1m:
-                switch (event.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-
-
-                        break;
-                    case  MotionEvent.ACTION_UP:
-
-                        break;
-                }
-                break;
-
-            case R.id.button1p:
-                switch (event.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-                        break;
-                    case  MotionEvent.ACTION_UP:
-                        break;
-                }
-                break;
-        }*/
-        return true;
-    }
-
-    public Runnable mfunction = new Runnable() {
-        @Override
-        public void run() {
-            //GradosMotor_intM1=restaGrados(editText_M1,GradosMotor_StringM1,GradosMotor_intM1);
-            handlerRepetir.postDelayed(this,250);//se ejecutara cada x mili segundos
-        }
-    };
 
 
 
@@ -297,30 +446,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-/*
-    @Override
-    public boolean onLongClick(View v) {
-        switch(v.getId()) {
-
-            case R.id.button1m:
-                restaGradosRepetible();
-                break;
-        }
-        return true;
-    }
-
-    private void restaGradosRepetible() {
-        final Handler handler= new Handler();
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                GradosMotor_intM1 = restaGrados(editText_M1, GradosMotor_StringM1, GradosMotor_intM1);//llamamos nuestro metodo
-                handler.postDelayed(this,500);//se ejecutara cada 10 segundos
-            }
-        },2000);//empezara a ejecutarse después de 5 milisegundos
-    }
-*/
 
 
 
