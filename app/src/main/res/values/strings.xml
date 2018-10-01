@@ -11,4 +11,7 @@
     <string name="txt_num_Grados_String">0-180</string>
     <string name="txt_view_Estado_M1">M1</string>
     <string name="txt_num_Grados_PorDefecto_String">90</string>
+    <string name="Dispositivos_Vinculados">Dispositivos Vinculados</string>
+    <string name="button_Conectar_Bt">Conectar Bluetooth</string>
+    <string name="button_Desonectar_Bt">Desconectar Bluetooth</string>
 </resources>
