@@ -14,4 +14,7 @@
     <string name="Dispositivos_Vinculados">Dispositivos Vinculados</string>
     <string name="button_Conectar_Bt">Conectar Bluetooth</string>
     <string name="button_Desonectar_Bt">Desconectar Bluetooth</string>
+    <string name="DesactivarBluetooth">Desactivar Bluetooth</string>
+    <string name="ActivarBluetooth">Activar Bluetooth</string>
+    <string name="Bluetooth">Bluetooth</string>
 </resources>

@@ -1,6 +1,7 @@
 package alex139139.controlbrazorobotico;
 
 
+import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -61,8 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private Button button_plus_M5;
     private Button button_plus_M6;
 
-    private Button button_ConectBt;
-    private Button button_DisconectBt;
+    private Button button_Bluetooth;
 
     private boolean AutoIncrement_boolean1 = false; //Incrementar
     private boolean AutoIncrement_boolean2 = false;
@@ -77,8 +77,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private boolean AutoDecrement_boolean4 = false;
     private boolean AutoDecrement_boolean5 = false;
     private boolean AutoDecrement_boolean6 = false;
-
-
 
     private Handler handlerRepetir= new Handler();
 
@@ -119,10 +117,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         button_plus_M5 = (Button)findViewById(R.id.button5p);
         button_plus_M6 = (Button)findViewById(R.id.button6p);
 
-        button_ConectBt = (Button)findViewById(R.id.button_ConectarBT);
-        button_DisconectBt = (Button)findViewById(R.id.button_DesconetarBT);
+        button_Bluetooth = (Button)findViewById(R.id.button_Bluetooth_id);
         IdBufferIn = (TextView)findViewById(R.id.IdBufferIn);
-
 
         editText_M1.setText(GradosMotor_StringM1);
         editText_M2.setText(GradosMotor_StringM2);
@@ -145,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         button_plus_M5.setOnTouchListener(this);
         button_plus_M6.setOnTouchListener(this);
 
-
+        button_Bluetooth.setOnTouchListener(this);
 
         button_plus_M1.setOnLongClickListener(this);
         button_plus_M2.setOnLongClickListener(this);
@@ -162,20 +158,15 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         button_less_M6.setOnLongClickListener(this);
         button_less_M1.setOnLongClickListener(this);
 
-
-
-
-
-
     }//Cierre Funcion onCreate
 
 
+
+
+
+
+
     //metodos Para sumar o restar grados
-
-
-
-
-
     @Override
     public boolean onLongClick(View v) {
         switch(v.getId()){
@@ -335,6 +326,14 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     GradosMotor_intM6=sumaGrados(GradosMotor_intM6,editText_M6);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoIncrement_boolean6 = false;
+                }
+                break;
+
+                /////////////////////////////////////////
+            case R.id.button_Bluetooth_id:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    Intent intent = new Intent(MainActivity.this,BluetoothActivity.class);
+                    startActivity(intent);
                 }
                 break;
         }
