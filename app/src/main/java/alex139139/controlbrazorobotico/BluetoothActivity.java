@@ -66,6 +66,7 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
                 bluetooth_On_Off();
                 break;
             case R.id.button_scan_id:
+                discover();
                 //scanBluetooth();
                 break;
         }
@@ -78,7 +79,7 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this,"Bluetooth On",Toast.LENGTH_SHORT).show();
-                ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.apagar_bluetooth);
+                //((Button)findViewById(R.id.button_Conect_id)).setText(R.string.apagar_bluetooth);
                 listPairedDevices();
 
             }else if(resultCode == RESULT_CANCELED){
@@ -111,7 +112,7 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
         //mBluetoothStatus.setText("Bluetooth enabled"); // textView  que muestra si el bluettoth esta encendido
 
         Toast.makeText(getApplicationContext(),"Bluetooth turned on",Toast.LENGTH_SHORT).show();
-        ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.apagar_bluetooth);
+        //((Button)findViewById(R.id.button_Conect_id)).setText(R.string.apagar_bluetooth);
 
     }
     private void bluetoothOff(){
@@ -119,7 +120,7 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
         mArrayAdapter.clear();
         //mBluetoothStatus.setText("Bluetooth disabled");
         Toast.makeText(getApplicationContext(),"Bluetooth turned Off", Toast.LENGTH_SHORT).show();
-        ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.encender_bluetooth);
+        //((Button)findViewById(R.id.button_Conect_id)).setText(R.string.encender_bluetooth);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void EstadoInicial_Bluetooth(){
@@ -196,20 +197,6 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
 
 
 
-    public  void scanBluetooth(){
-
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent,REQUEST_ENABLE_BT);
-        }
-        if(mBluetoothAdapter.isDiscovering()){
-
-            mBluetoothAdapter.cancelDiscovery();
-        }else if(!mBluetoothAdapter.isDiscovering()){
-
-            mBluetoothAdapter.startDiscovery();
-        }
-    }
     ///////////////////////   BroadcastReceiver  /////////////////////////////////////////////////////////////////
 
     // Instanciamos un BroadcastReceiver que se encargara de detectar si el estado
