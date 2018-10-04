@@ -11,13 +11,12 @@
     <string name="txt_num_Grados_String">0-180</string>
     <string name="txt_view_Estado_M1">M1</string>
     <string name="txt_num_Grados_PorDefecto_String">90</string>
+
+
     <string name="Dispositivos_Vinculados">Dispositivos Vinculados</string>
-    <string name="button_Conectar_Bt">Conectar Bluetooth</string>
-    <string name="button_Desonectar_Bt">Desconectar Bluetooth</string>
-    <string name="DesactivarBluetooth">Bluetooth ON</string>
-    <string name="ActivarBluetooth">Bluetooth OFF</string>
-    <string name="Bluetooth">Bluetooth</string>
-    <string name="scan">Scan</string>
+    <string name="apagar_bluetooth">Apagar Bluetooth</string>
+    <string name="encender_bluetooth">Encender Bluetooth</string>
+    <string name="cancelar">Cancelar</string>
     <string name="buscar">Buscar</string>
-    <string name="detenerBusqueda">Detener Busqueda</string>
+
 </resources>
