@@ -7,7 +7,7 @@
     tools:context=".ListDevice">
 
     <Button
-        android:id="@+id/button_Conect"
+        android:id="@+id/button_Conect_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -17,11 +17,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.026"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ListView_Device"
+        app:layout_constraintTop_toBottomOf="@+id/ListView_Device_id"
         app:layout_constraintVertical_bias="0.815" />
 
     <ListView
-        android:id="@+id/ListView_Device"
+        android:id="@+id/ListView_Device_id"
         android:layout_width="0dp"
         android:layout_height="325dp"
         android:layout_marginStart="8dp"
@@ -32,7 +32,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button_scan"
+        android:id="@+id/button_scan_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -43,6 +43,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ListView_Device"
+        app:layout_constraintTop_toBottomOf="@+id/ListView_Device_id"
         app:layout_constraintVertical_bias="0.857" />
 </android.support.constraint.ConstraintLayout>

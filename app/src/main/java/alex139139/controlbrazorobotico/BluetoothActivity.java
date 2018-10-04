@@ -9,14 +9,14 @@ import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.util.Log;
+
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
+
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -29,7 +29,9 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
     private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private Set<BluetoothDevice> pairedDevices;
     private ArrayAdapter mArrayAdapter;
+
     //private ArrayList mArrayList = new ArrayList();
+
 
     private Button button_Conect;
     private Button button_Scan;
@@ -44,11 +46,13 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
         setContentView(R.layout.activity_bluetooth);
 
 
-        button_Conect = (Button) findViewById(R.id.button_Conect);
-        button_Scan = (Button) findViewById(R.id.button_scan);
-        ListView_Device = (ListView) findViewById(R.id.ListView_Device);
+        button_Conect = (Button) findViewById(R.id.button_Conect_id);
+        button_Scan = (Button) findViewById(R.id.button_scan_id);
+        ListView_Device = (ListView) findViewById(R.id.ListView_Device_id);
+
 
         EstadoInicial_Bluetooth();
+
         registrar_EventosBluetooth();
 
         button_Conect.setOnClickListener(this);
@@ -60,16 +64,16 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
 
     public void EstadoInicial_Bluetooth(){
         if (mBluetoothAdapter.isEnabled()) {
-            ((Button) findViewById(R.id.button_Conect)).setText(R.string.DesactivarBluetooth);
+            ((Button) findViewById(R.id.button_Conect_id)).setText(R.string.DesactivarBluetooth);
             pairedDevicesList();
         } else if (!mBluetoothAdapter.isEnabled()) {
-            ((Button) findViewById(R.id.button_Conect)).setText(R.string.ActivarBluetooth);
+            ((Button) findViewById(R.id.button_Conect_id)).setText(R.string.ActivarBluetooth);
         }
         if(mBluetoothAdapter.isDiscovering()){
-            ((Button) findViewById(R.id.button_scan)).setText(R.string.detenerBusqueda);
+            ((Button) findViewById(R.id.button_scan_id)).setText(R.string.detenerBusqueda);
         }
         if(!mBluetoothAdapter.isDiscovering()){
-            ((Button) findViewById(R.id.button_scan)).setText(R.string.buscar);
+            ((Button) findViewById(R.id.button_scan_id)).setText(R.string.buscar);
         }
     }
     public void funcion_Bluetooth(){
@@ -113,10 +117,10 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.button_Conect:
+            case R.id.button_Conect_id:
                 funcion_Bluetooth();
                 break;
-            case R.id.button_scan:
+            case R.id.button_scan_id:
                 scanBluetooth();
                 break;
         }
@@ -143,13 +147,12 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
             }
             if(BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
                 Toast.makeText(BluetoothActivity.this,"Iniciando Busqueda ",Toast.LENGTH_SHORT).show();
-                ((Button) findViewById(R.id.button_scan)).setText(R.string.detenerBusqueda);
+                ((Button) findViewById(R.id.button_scan_id)).setText(R.string.detenerBusqueda);
 
             }
-            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
-                Toast.makeText(BluetoothActivity.this,"Busqueda Detenida ",Toast.LENGTH_SHORT).show();
+            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){ Toast.makeText(BluetoothActivity.this,"Busqueda Detenida ",Toast.LENGTH_SHORT).show();
 
-                ((Button) findViewById(R.id.button_scan)).setText(R.string.buscar);
+                ((Button) findViewById(R.id.button_scan_id)).setText(R.string.buscar);
             }
 
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
@@ -160,7 +163,7 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
                     // Apagado
                     case BluetoothAdapter.STATE_OFF:
                     {
-                        ((Button)findViewById(R.id.button_Conect)).setText(R.string.ActivarBluetooth);
+                        ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.ActivarBluetooth);
                         Toast.makeText(BluetoothActivity.this, "Bluetooth Apagado", Toast.LENGTH_SHORT).show();
                         break;
                     }
@@ -168,7 +171,7 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
                     case BluetoothAdapter.STATE_ON:
                     {
                         pairedDevicesList();
-                        ((Button)findViewById(R.id.button_Conect)).setText(R.string.DesactivarBluetooth);
+                        ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.DesactivarBluetooth);
 
                         break;
                     }
@@ -261,8 +264,6 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
         ListView_Device.setAdapter(mArrayAdapter);
         //ListView_Device.setOnItemClickListener(myListClickListener); //Method called when the device from the list is clicked
     }
-
-
 
 
 }// cierre del activity
