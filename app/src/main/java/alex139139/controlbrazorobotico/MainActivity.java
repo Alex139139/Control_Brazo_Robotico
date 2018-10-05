@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private EditText editText_M5;
     private EditText editText_M6;
 
-    private TextView IdBufferIn;
+
 
 
     private Button button_less_M1;
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         button_plus_M6 = (Button)findViewById(R.id.button6p);
 
         button_Bluetooth = (Button)findViewById(R.id.button_Bluetooth_id);
-        IdBufferIn = (TextView)findViewById(R.id.IdBufferIn);
+
 
         editText_M1.setText(GradosMotor_StringM1);
         editText_M2.setText(GradosMotor_StringM2);

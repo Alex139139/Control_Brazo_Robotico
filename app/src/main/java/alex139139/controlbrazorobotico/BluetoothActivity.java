@@ -6,6 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,7 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 
-public class BluetoothActivity extends AppCompatActivity implements View.OnClickListener {
+public class BluetoothActivity extends AppCompatActivity  {
 
 
     private static int REQUEST_ENABLE_BT = 1;
@@ -46,31 +49,39 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
         button_Conect = (Button) findViewById(R.id.button_Conect_id);
         button_Scan = (Button) findViewById(R.id.button_scan_id);
         ListView_Device = (ListView) findViewById(R.id.ListView_Device_id);
-        mArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
+        mArrayAdapter = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         ListView_Device.setAdapter(mArrayAdapter);
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
 
+        filtros_ACTION_BT();
         EstadoInicial_Bluetooth();
 
-        button_Conect.setOnClickListener(this);
-        button_Scan.setOnClickListener(this);
+        if (mArrayAdapter == null) {
+            // Device does not support Bluetooth
+           // mBluetoothStatus.setText("Status: Bluetooth not found");
+            Toast.makeText(getApplicationContext(),"Bluetooth device not found!",Toast.LENGTH_SHORT).show();
+        }
+        else {
 
+            button_Scan.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    discover();
+                }
+            });
+            button_Conect.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    bluetooth_On_Off();
+                }
+            });
+        }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.button_Conect_id:
-                bluetooth_On_Off();
-                break;
-            case R.id.button_scan_id:
-                discover();
-                //scanBluetooth();
-                break;
-        }
-    }
 
     //// En Lee el requestCode que se origina un activity//////////////////////////////////////////////////
     @Override
@@ -79,18 +90,11 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this,"Bluetooth On",Toast.LENGTH_SHORT).show();
-                //((Button)findViewById(R.id.button_Conect_id)).setText(R.string.apagar_bluetooth);
-                listPairedDevices();
+
+
 
             }else if(resultCode == RESULT_CANCELED){
                 Toast.makeText(this, "Bluetooth Off", Toast.LENGTH_SHORT).show();
-            }
-        }
-        if(requestCode == DISCOVERABLE_DURATION_120){
-            if (resultCode == DISCOVERABLE_DURATION_120) {
-                //Toast.makeText(this,"Buscando...",Toast.LENGTH_SHORT).show();
-            }else if(resultCode == RESULT_CANCELED){
-                Toast.makeText(this, "Busqueda cancelada", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -120,7 +124,7 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
         mArrayAdapter.clear();
         //mBluetoothStatus.setText("Bluetooth disabled");
         Toast.makeText(getApplicationContext(),"Bluetooth turned Off", Toast.LENGTH_SHORT).show();
-        //((Button)findViewById(R.id.button_Conect_id)).setText(R.string.encender_bluetooth);
+        ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.encender_bluetooth);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void EstadoInicial_Bluetooth(){
@@ -161,18 +165,16 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
         // Check if the device is already discovering
         if(mBluetoothAdapter.isDiscovering()){
             mBluetoothAdapter.cancelDiscovery();
-            Toast.makeText(getApplicationContext(),"Discovery stopped",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"Discovery stopped",Toast.LENGTH_SHORT).show();
         }
         else{
             if(mBluetoothAdapter.isEnabled()) {
                 mArrayAdapter.clear(); // clear items
                 mBluetoothAdapter.startDiscovery();
-                Toast.makeText(getApplicationContext(), "Discovery started", Toast.LENGTH_SHORT).show();
-                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-                registerReceiver(mReceiver,filter );
+                //Toast.makeText(getApplicationContext(), "Discovery started", Toast.LENGTH_SHORT).show();
             }
             else{
-                Toast.makeText(getApplicationContext(), "Bluetooth not on", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Bluetooth apagado!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -187,46 +189,15 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
                 mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
                 mArrayAdapter.notifyDataSetChanged();
             }
-        }
-    };
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-    ///////////////////////   BroadcastReceiver  /////////////////////////////////////////////////////////////////
-
-    // Instanciamos un BroadcastReceiver que se encargara de detectar si el estado
-    // del Bluetooth del dispositivo ha cambiado mediante su handler onReceive
-/*    private final BroadcastReceiver mReceiver  = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            ArrayList mArrayList = new ArrayList();
-            final String action = intent.getAction();
-            // Filtramos por la accion. Nos interesa detectar BluetoothAdapter.ACTION_STATE_CHANGED
-
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // Get the BluetoothDevice object from the Intent
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                // Add the name and address to an array adapter to show in a ListView
-                mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-                //mArrayAdapter.notifyDataSetChanged();
-                mArrayAdapter = new ArrayAdapter(BluetoothActivity.this,android.R.layout.simple_list_item_1, mArrayList);
-                ListView_Device.setAdapter(mArrayAdapter);
-            }
             if(BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
                 Toast.makeText(BluetoothActivity.this,"Iniciando Busqueda ",Toast.LENGTH_SHORT).show();
-                ((Button) findViewById(R.id.button_scan_id)).setText(R.string.detenerBusqueda);
+                ((Button) findViewById(R.id.button_scan_id)).setText(R.string.cancelar);
 
             }
-            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){ Toast.makeText(BluetoothActivity.this,"Busqueda Detenida ",Toast.LENGTH_SHORT).show();
+            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){ Toast.makeText(BluetoothActivity.this,"Busqueda Finalizada ",Toast.LENGTH_SHORT).show();
 
                 ((Button) findViewById(R.id.button_scan_id)).setText(R.string.buscar);
             }
-
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 // Solicitamos la informacion extra del intent etiquetada como BluetoothAdapter.EXTRA_STATE
                 // El segundo parametro indicara el valor por defecto que se obtendra si el dato extra no existe
@@ -235,64 +206,31 @@ public class BluetoothActivity extends AppCompatActivity implements View.OnClick
                     // Apagado
                     case BluetoothAdapter.STATE_OFF:
                     {
-                        ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.ActivarBluetooth);
+                        ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.encender_bluetooth);
                         Toast.makeText(BluetoothActivity.this, "Bluetooth Apagado", Toast.LENGTH_SHORT).show();
                         break;
                     }
                     // Encendido
                     case BluetoothAdapter.STATE_ON:
                     {
-                        pairedDevicesList();
-                        ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.DesactivarBluetooth);
-
+                        listPairedDevices();
+                        ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.apagar_bluetooth);
                         break;
                     }
-                    default:
-                        break;
                 }
             }
-            *//*if(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED.equals(action)){
-                final int estadoScaneo = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE,BluetoothAdapter.ERROR);
-                switch (estadoScaneo) {
-                    //Conectable y Decubrible
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
-                        Toast.makeText(BluetoothActivity.this,"Buscando...",Toast.LENGTH_SHORT).show();
-                        break;
-                    //Conectable pero Indescubrible
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
-                        Toast.makeText(BluetoothActivity.this,"Solo Dispositivos Conetados",Toast.LENGTH_SHORT).show();
-                        break;
-                     //Inconectable e Indescubrible
-                    case BluetoothAdapter.SCAN_MODE_NONE:
-                        Toast.makeText(BluetoothActivity.this,"Sin Buscar y sin localizar",Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }*//*
         }
 
-
-    };*/
-
-    /*private void registrar_EventosBluetooth() {
-        // Registramos el BroadcastReceiver que instanciamos previamente para
-        // detectar los distintos eventos que queremos recibir
-        IntentFilter filtro = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-        filtro.addAction(BluetoothDevice.ACTION_FOUND);
-        filtro.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        filtro.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        this.registerReceiver(mReceiver , filtro);
-    }*/
-
-
-
-    // Ademas de realizar la destruccion de la actividad, eliminamos el registro del
-    // BroadcastReceiver.
-
-
-
-
-
-
-
+    };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public  void filtros_ACTION_BT(){
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(mReceiver,filter );
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }// cierre del activity
