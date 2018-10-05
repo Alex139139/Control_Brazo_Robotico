@@ -16,6 +16,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,13 +32,12 @@ public class BluetoothActivity extends AppCompatActivity  {
     private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private Set<BluetoothDevice> pairedDevices;
     private ArrayAdapter<String> mArrayAdapter;
-
-
-
+    private ArrayAdapter<String> mArrayAdapter2;
 
     private Button button_Conect;
     private Button button_Scan;
     private ListView ListView_Device;
+    private ListView ListView_DeviceE;
 
 
 
@@ -49,9 +50,11 @@ public class BluetoothActivity extends AppCompatActivity  {
         button_Conect = (Button) findViewById(R.id.button_Conect_id);
         button_Scan = (Button) findViewById(R.id.button_scan_id);
         ListView_Device = (ListView) findViewById(R.id.ListView_Device_id);
-        mArrayAdapter = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
+        ListView_DeviceE =(ListView) findViewById(R.id.ListView_DeviceE_id);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        ListView_Device.setAdapter(mArrayAdapter);
+        mArrayAdapter = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
+        mArrayAdapter2 = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
+        //ListView_Device.setAdapter(mArrayAdapter);
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
 
@@ -121,7 +124,7 @@ public class BluetoothActivity extends AppCompatActivity  {
     }
     private void bluetoothOff(){
         mBluetoothAdapter.disable(); // turn off
-        mArrayAdapter.clear();
+        //mArrayAdapter.clear();
         //mBluetoothStatus.setText("Bluetooth disabled");
         Toast.makeText(getApplicationContext(),"Bluetooth turned Off", Toast.LENGTH_SHORT).show();
         ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.encender_bluetooth);
@@ -130,7 +133,7 @@ public class BluetoothActivity extends AppCompatActivity  {
     public void EstadoInicial_Bluetooth(){
         if (mBluetoothAdapter.isEnabled()) {
             ((Button) findViewById(R.id.button_Conect_id)).setText(R.string.apagar_bluetooth);
-
+            listPairedDevices();
         } else if (!mBluetoothAdapter.isEnabled()) {
             ((Button) findViewById(R.id.button_Conect_id)).setText(R.string.encender_bluetooth);
         }
@@ -150,14 +153,15 @@ public class BluetoothActivity extends AppCompatActivity  {
                 for (BluetoothDevice device : pairedDevices){
                     mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
                 }
-                Toast.makeText(getApplicationContext(), "Show Paired Devices", Toast.LENGTH_SHORT).show();
+                ListView_Device.setAdapter(mArrayAdapter);
+                //Toast.makeText(getApplicationContext(), "Show Paired Devices", Toast.LENGTH_SHORT).show();
             }
             else {
                 Toast.makeText(getApplicationContext(), "No Paired Bluetooth Devices Found.", Toast.LENGTH_LONG).show();
             }
         }
         else
-            Toast.makeText(getApplicationContext(), "Bluetooth not on", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Bluetooth not on_Lista de dispositivos", Toast.LENGTH_SHORT).show();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +173,7 @@ public class BluetoothActivity extends AppCompatActivity  {
         }
         else{
             if(mBluetoothAdapter.isEnabled()) {
-                mArrayAdapter.clear(); // clear items
+                mArrayAdapter2.clear(); // clear items
                 mBluetoothAdapter.startDiscovery();
                 //Toast.makeText(getApplicationContext(), "Discovery started", Toast.LENGTH_SHORT).show();
             }
@@ -186,8 +190,9 @@ public class BluetoothActivity extends AppCompatActivity  {
             if(BluetoothDevice.ACTION_FOUND.equals(action)){
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // add the name to the list
-                mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-                mArrayAdapter.notifyDataSetChanged();
+                mArrayAdapter2.add(device.getName() + "\n" + device.getAddress());
+                ListView_DeviceE.setAdapter(mArrayAdapter2);
+                mArrayAdapter2.notifyDataSetChanged();
             }
             if(BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
                 Toast.makeText(BluetoothActivity.this,"Iniciando Busqueda ",Toast.LENGTH_SHORT).show();
@@ -207,6 +212,8 @@ public class BluetoothActivity extends AppCompatActivity  {
                     case BluetoothAdapter.STATE_OFF:
                     {
                         ((Button)findViewById(R.id.button_Conect_id)).setText(R.string.encender_bluetooth);
+                        mArrayAdapter.clear();
+                        mArrayAdapter2.clear();
                         Toast.makeText(BluetoothActivity.this, "Bluetooth Apagado", Toast.LENGTH_SHORT).show();
                         break;
                     }
