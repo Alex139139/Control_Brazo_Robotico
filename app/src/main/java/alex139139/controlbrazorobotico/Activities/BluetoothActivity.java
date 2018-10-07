@@ -1,12 +1,10 @@
-package alex139139.controlbrazorobotico;
+package alex139139.controlbrazorobotico.Activities;
 
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
@@ -34,6 +32,9 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.UUID;
+
+import alex139139.controlbrazorobotico.Manifest;
+import alex139139.controlbrazorobotico.R;
 
 
 public class BluetoothActivity extends AppCompatActivity  {

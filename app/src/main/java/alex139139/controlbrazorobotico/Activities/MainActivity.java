@@ -1,4 +1,4 @@
-package alex139139.controlbrazorobotico;
+package alex139139.controlbrazorobotico.Activities;
 
 
 import android.content.Intent;
@@ -10,9 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import alex139139.controlbrazorobotico.R;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener,View.OnTouchListener {
