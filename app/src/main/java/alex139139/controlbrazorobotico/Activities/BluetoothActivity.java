@@ -96,20 +96,29 @@ public class BluetoothActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
 
-        asignacionID();
-        EstadoInicial_UI();
+        inicializacion();
 
         //BluetoothManager mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
+
+
+
         mArrayAdapter = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
         mArrayAdapter2 = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
 
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
 
         filtros_ACTION_BT();
+        EstadoInicial_Bluetooth();
+
+        ListView_Device.setOnItemClickListener(mDeviceClickListener);
+        ListView_DeviceE.setOnItemClickListener(mDeviceClickListener);
+
+        textView_StatusBT.setOnLongClickListener(mDeviceLongClickListener);
+
 
         if (mArrayAdapter == null) {
             // Device does not support Bluetooth
@@ -117,6 +126,7 @@ public class BluetoothActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Bluetooth device not found!",Toast.LENGTH_SHORT).show();
         }
         else {
+
             button_Scan.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -129,10 +139,9 @@ public class BluetoothActivity extends AppCompatActivity {
                     bluetooth_On_Off();
                 }
             });
-            ListView_Device.setOnItemClickListener(mDeviceClickListener);
-            ListView_DeviceE.setOnItemClickListener(mDeviceClickListener);
-            textView_StatusBT.setOnLongClickListener(mDeviceLongClickListener);
         }
+
+
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,12 +154,14 @@ public class BluetoothActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this,"Bluetooth On",Toast.LENGTH_SHORT).show();
 
+
+
             }else if(resultCode == RESULT_CANCELED){
                 Toast.makeText(this, "Bluetooth Off", Toast.LENGTH_SHORT).show();
             }
         }
     }
-    public void asignacionID(){
+    public void inicializacion(){
         textView_StatusBT = (TextView)findViewById(R.id.textView_StadusBT_id);
         textView_StatusBT_MAC = (TextView)findViewById(R.id.textView_StadusBT_MAC_id);
         button_Conect = (Button) findViewById(R.id.button_Conect_id);
@@ -178,7 +189,7 @@ public class BluetoothActivity extends AppCompatActivity {
                 .sendToTarget();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void EstadoInicial_UI(){
+    public void EstadoInicial_Bluetooth(){
         if (mBluetoothAdapter.isEnabled()) {
             handlerBT.obtainMessage(STATE_BT_ON)
                     .sendToTarget();
