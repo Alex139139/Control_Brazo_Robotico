@@ -7,7 +7,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <permission android:name="android.permission.BLUETOOTH" android:label="BLUETOOTH" />
+    <permission
+        android:name="android.permission.BLUETOOTH"
+        android:label="BLUETOOTH" />
     <permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -26,7 +28,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.BluetoothActivity"></activity>
+        <activity android:name=".Activities.BluetoothActivity" />
+        <activity android:name=".Activities.Pruebas" />
+
+        <service android:name=".Services.BluetoothService_Test"/>
+
     </application>
 
 </manifest>

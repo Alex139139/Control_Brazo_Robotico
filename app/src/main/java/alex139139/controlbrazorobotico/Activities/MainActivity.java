@@ -3,6 +3,7 @@ package alex139139.controlbrazorobotico.Activities;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -12,7 +13,9 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
+
 import alex139139.controlbrazorobotico.R;
+
 
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener,View.OnTouchListener {
@@ -44,9 +47,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private EditText editText_M4;
     private EditText editText_M5;
     private EditText editText_M6;
-
-
-
 
     private Button button_less_M1;
     private Button button_less_M2;
@@ -383,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             }
         }
     }
+
 
     class handlerRepetir_class_Suma implements Runnable{
         @Override
