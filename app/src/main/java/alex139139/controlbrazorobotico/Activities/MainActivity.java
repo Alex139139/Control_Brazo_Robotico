@@ -3,7 +3,6 @@ package alex139139.controlbrazorobotico.Activities;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;

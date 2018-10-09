@@ -30,8 +30,13 @@
         </activity>
         <activity android:name=".Activities.BluetoothActivity" />
         <activity android:name=".Activities.Pruebas" />
+        <service android:name=".Services.BluetoothService_Test"
+            android:enabled="true"
+            android:exported="true">
+            
+        </service>
 
-        <service android:name=".Services.BluetoothService_Test"/>
+
 
     </application>
 

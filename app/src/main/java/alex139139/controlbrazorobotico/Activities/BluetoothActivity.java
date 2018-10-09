@@ -14,7 +14,6 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -35,57 +34,58 @@ import java.util.UUID;
 
 import alex139139.controlbrazorobotico.Manifest;
 import alex139139.controlbrazorobotico.R;
-////////////////////////////////////////////
 import alex139139.controlbrazorobotico.Services.BluetoothService_Test;
+////////////////////////////////////////////
 
 
 public class BluetoothActivity extends AppCompatActivity {
 //public class BluetoothActivity extends FragmentActivity {
 
+    private BluetoothService_Test mBTService = null;
+
     private Set<BluetoothDevice> pairedDevices;
     private ArrayAdapter<String> mArrayAdapter;
     private ArrayAdapter<String> mArrayAdapter2;
-    private BluetoothDevice device;
-
+    ////////////////////////////////////////////
     private TextView textView_StatusBT;
     private TextView textView_StatusBT_MAC;
     private Button button_Conect;
     private Button button_Scan;
+    private Button button_Disconnect;
     private ListView ListView_Device;
     private ListView ListView_DeviceE;
 
     ////////////////////////////////////////////
     ///////////Conectividad BT/////////////////
-
     //private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     //BluetoothManager mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
-
+    ////////////////////////////////////////////
     BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothSocket mBTSocket;
-
+    ////////////////////////////////////////////
     static final int STATE_SEARCHING = 1;
     static final int STATE_NO_SEARCHING = 2;
     static final int STATE_DISCONNECT = 3;
-    static final int STATE_CONNECTING = 4;
-    static final int STATE_CONNECTED = 5;
-    static final int STATE_CONNECTED_MAC =6;
-    static final int STATE_CONNECTION_FAILED = 7;
-    static final int STATE_BT_ON = 8;
-    static final int STATE_BT_OFF = 9;
-    static final int STATE_FOUND = 10;
-    static final int STATE_NOT_FOUND = 11;
-    static final int STATE_TEST = 12;
-    static final int STATE_MESSAGE_RECEIVED = 13;
+    static final int STATE_DISCONNECTION_FAILED = 4;
+    static final int STATE_CONNECTING = 5;
+    static final int STATE_CONNECTED = 6;
+    static final int STATE_CONNECTED_MAC =7;
+    static final int STATE_CONNECTION_FAILED = 8;
+    static final int STATE_CONNECTION_LOST = 9;
+    static final int STATE_BT_ON = 10;
+    static final int STATE_BT_OFF = 11;
+    static final int STATE_FOUND = 12;
+    static final int STATE_NOT_FOUND = 13;
+    static final int STATE_TEST = 14;
+    static final int STATE_MESSAGE_RECEIVED = 15;
 
     private static int REQUEST_ENABLE_BT = 1;
-
     ////////////////////////////////////////////
-    private int mConnectionState;
     private String mBTaddress;
     private String mBTname;
-
-    private static final UUID BT_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");// "random" unique identifier
+    ////////////////////////////////////////////
+    private static final UUID mBTUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");// "random" unique identifier
     //493489e8-785b-4fa3-8f7f-285bf74bd1e7
     //////////////////////////////////////////
     private ConnectedThread mConnectedThread;
@@ -103,8 +103,6 @@ public class BluetoothActivity extends AppCompatActivity {
         mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
 
-
-
         mArrayAdapter = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
         mArrayAdapter2 = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
 
@@ -112,7 +110,7 @@ public class BluetoothActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
 
         filtros_ACTION_BT();
-        EstadoInicial_Bluetooth();
+        EstadoInicial_UI();
 
         ListView_Device.setOnItemClickListener(mDeviceClickListener);
         ListView_DeviceE.setOnItemClickListener(mDeviceClickListener);
@@ -139,12 +137,57 @@ public class BluetoothActivity extends AppCompatActivity {
                     bluetooth_On_Off();
                 }
             });
+            button_Disconnect.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mBTaddress = null;
+                    mBTService.stop();
+                }
+            });
         }
 
 
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        //mBTService.stop();
+//        if(mBTService != null){
+//
+//        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onResume() {
+        super.onResume();
+        int State=0;
+
+        if(mBTService != null){
+            State = mBTService.getState();
+            if(State == 0){
+                mBTService.start();
+            }
+        }
+
+
+
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Only if the state is STATE_NONE, do we know that we haven't started already
+        mBTService =new BluetoothService_Test(this,handlerBT);
+
+    }
+
+
+
 
     //// En Lee el requestCode que se origina un activity//////////////////////////////////////////////////
     @Override
@@ -154,20 +197,20 @@ public class BluetoothActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this,"Bluetooth On",Toast.LENGTH_SHORT).show();
 
-
-
             }else if(resultCode == RESULT_CANCELED){
                 Toast.makeText(this, "Bluetooth Off", Toast.LENGTH_SHORT).show();
             }
         }
     }
     public void inicializacion(){
-        textView_StatusBT = (TextView)findViewById(R.id.textView_StadusBT_id);
-        textView_StatusBT_MAC = (TextView)findViewById(R.id.textView_StadusBT_MAC_id);
-        button_Conect = (Button) findViewById(R.id.button_Conect_id);
-        button_Scan = (Button) findViewById(R.id.button_scan_id);
-        ListView_Device = (ListView) findViewById(R.id.ListView_Device_id);
-        ListView_DeviceE =(ListView) findViewById(R.id.ListView_DeviceE_id);
+
+            textView_StatusBT = (TextView)findViewById(R.id.textView_StatusBT_id);
+            textView_StatusBT_MAC = (TextView)findViewById(R.id.textView_StatusBT_MAC_id);
+            button_Conect = (Button) findViewById(R.id.button_Conect_id);
+            button_Scan = (Button) findViewById(R.id.button_scan_id);
+            button_Disconnect = (Button)findViewById(R.id.button_Disconnect_id);
+            ListView_Device = (ListView) findViewById(R.id.ListView_Device_id);
+            ListView_DeviceE =(ListView) findViewById(R.id.ListView_DeviceE_id);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void bluetooth_On_Off(){
@@ -189,7 +232,7 @@ public class BluetoothActivity extends AppCompatActivity {
                 .sendToTarget();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void EstadoInicial_Bluetooth(){
+    public void EstadoInicial_UI(){
         if (mBluetoothAdapter.isEnabled()) {
             handlerBT.obtainMessage(STATE_BT_ON)
                     .sendToTarget();
@@ -232,16 +275,18 @@ public class BluetoothActivity extends AppCompatActivity {
         }
         else{
             if(mBluetoothAdapter.isEnabled()) {
-                mArrayAdapter2.clear();
-                if(mBTSocket != null){
 
-                    mConnectThread.cancel();
-                    mBTaddress=null;
-                    mBluetoothAdapter.startDiscovery();
-
-                }else{
-                    mBluetoothAdapter.startDiscovery();
-                }
+                mBluetoothAdapter.startDiscovery();
+                mBTaddress = null;
+                mBTService.stop();
+//                if(mBTSocket != null){
+//
+//                    //mConnectedThread.cancel();
+//                    mBluetoothAdapter.startDiscovery();
+//
+//                }else{
+//                    mBluetoothAdapter.startDiscovery();
+//                }
             }
             else{
                 Toast.makeText(getApplicationContext(), "Bluetooth apagado!", Toast.LENGTH_SHORT).show();
@@ -284,6 +329,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
 
             if(BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
+                mArrayAdapter2.clear();
                 handlerBT.obtainMessage(STATE_SEARCHING)
                         .sendToTarget();
             }
@@ -310,7 +356,6 @@ public class BluetoothActivity extends AppCompatActivity {
                                 .sendToTarget();
                         break;
 
-
                     case BluetoothAdapter.STATE_ON:
 
                         listPairedDevices();
@@ -319,7 +364,6 @@ public class BluetoothActivity extends AppCompatActivity {
                         break;
                 }
             }
-
         }
     };
 
@@ -328,22 +372,8 @@ public class BluetoothActivity extends AppCompatActivity {
 
         @Override
         public boolean onLongClick(View v) {
-            new Thread(){
-                public void run(){
-                    if(mBTSocket != null) {
-                        mBTaddress = null;
-                        //mConnectedThread.cancel();
-                        mConnectThread.cancel();
-
-                        handlerBT.obtainMessage(STATE_DISCONNECT)
-                                .sendToTarget();
-                    }
-                    else{
-                        handlerBT.obtainMessage(STATE_DISCONNECT)
-                                .sendToTarget();
-                    }
-                }
-            }.start();
+            mBTaddress = null;
+            mBTService.stop();
             return false;
         }
     };
@@ -360,11 +390,15 @@ public class BluetoothActivity extends AppCompatActivity {
             final String name = info.substring(0,info.length() - 17);
             if(!address.equals(mBTaddress)){
                 BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+                //mConnectThread =new ConnectThread(device,name,address,mBTUUID);
+                //mConnectThread.start();
+                // Only if the state is STATE_NONE, do we know that we haven't started already
+                if (mBTService.getState() == BluetoothService_Test.S_STATE_NONE) {
+                    // Start the Bluetooth chat services
 
-                if(mBTSocket == null){
-
-                    Conexcion(device,name,address);
                 }
+                mBTService.connect(device);
+
 
             }else{
                 Toast.makeText(getBaseContext(), "Dispositivo Conectado", Toast.LENGTH_SHORT).show();
@@ -372,43 +406,102 @@ public class BluetoothActivity extends AppCompatActivity {
         }
     };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void Conexcion(BluetoothDevice device,final String name, final String addrees){
-        if(mBTSocket == null){
 
-            mConnectThread =new ConnectThread(device);
-            new Thread(){
-                public void run(){
-                    boolean connected = false;
-                    try {
-                        mBTSocket.connect();
-                        connected = true;
-                    } catch(IOException e) {
-                        Log.d("CONNECTTHREAD","Could not connect: " + e.toString());
-                        try {
-                            //bTSocket.close();
-                            mBTSocket.close();
-                            handlerBT.obtainMessage(STATE_CONNECTION_FAILED)
-                                    .sendToTarget();
-                            connected = false;
-                        } catch(IOException close) {
-                            Log.d("CONNECTTHREAD", "Could not close connection:" + e.toString());
-                            handlerBT.obtainMessage(STATE_CONNECTION_FAILED)
-                                    .sendToTarget();
-                            connected = false;
-                        }
-                    }
-                    if(connected){
-                        mConnectedThread = new ConnectedThread(mBTSocket);
-                        mConnectedThread.start();
-                        handlerBT.obtainMessage(STATE_CONNECTED, name)
-                                .sendToTarget();
-                        handlerBT.obtainMessage(STATE_CONNECTED_MAC,addrees)
-                                .sendToTarget();
-                    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private class ConnectThread extends Thread {
+        //private BluetoothSocket mmSocket;
+        private final BluetoothDevice mmDevice;
+        private final String mmAddress;
+        private  final String mmName;
+        private  final UUID mmUUID;
+
+
+        public ConnectThread(BluetoothDevice device,final String name, final String address,UUID uuid) {
+            this.mmAddress = address;
+            this.mmName = name;
+            this.mmDevice = device;
+            //this.mmSocket = socket;
+            this.mmUUID = uuid;
+            BluetoothSocket tmp = null;
+            try {
+                tmp = mmDevice.createRfcommSocketToServiceRecord(mmUUID);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //mmSocket = tmp;
+            mBTSocket = tmp;
+        }
+
+        @Override
+        public void run() {
+            boolean connected = false;
+            mBluetoothAdapter.cancelDiscovery();
+            try {
+                mBTSocket.connect();
+                connected = true;
+            } catch(IOException e) {
+                Log.d("CONNECTTHREAD","Could not connect: " + e.toString());
+                try {
+                    //bTSocket.close();
+                    mBTSocket.close();
+                    handlerBT.obtainMessage(STATE_CONNECTION_FAILED)
+                            .sendToTarget();
+                    connected = false;
+                } catch(IOException close) {
+                    Log.d("CONNECTTHREAD", "Could not close connection:" + e.toString());
+                    handlerBT.obtainMessage(STATE_CONNECTION_FAILED)
+                            .sendToTarget();
+                    connected = false;
                 }
-            }.start();
+            }
+            if(connected){
+                mConnectedThread = new ConnectedThread(mBTSocket);
+                mConnectedThread.start();
+                handlerBT.obtainMessage(STATE_CONNECTED, mmName)
+                        .sendToTarget();
+                handlerBT.obtainMessage(STATE_CONNECTED_MAC,mmAddress)
+                        .sendToTarget();
+            }
+        }
+
+        public void cancel() {
+            try {
+                mBTSocket.close();
+                //mBTSocket = null;
+
+            } catch (IOException e) {
+                Log.e("PrinterService", "close() of connect socket failed", e);
+                handlerBT.obtainMessage(STATE_DISCONNECTION_FAILED)
+                        .sendToTarget();
+            }
+        }
+        public boolean cancel_bis() {
+            try {
+                mBTSocket.close();
+                //mBTSocket = null;
+            } catch(IOException e) {
+                Log.d("CONNECTTHREAD","Could not close connection:" + e.toString());
+                handlerBT.obtainMessage(STATE_DISCONNECTION_FAILED)
+                        .sendToTarget();
+                return false;
+            }
+            return true;
+        }
+        public BluetoothSocket createBluetoothSocket(BluetoothDevice device, UUID mUUID) throws IOException {
+            try {
+                final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
+                //Method m = device.getClass().getMethod("createRfcommSocket", new Class[] { int.class });
+                return (BluetoothSocket) m.invoke(device, mUUID);
+            } catch (Exception e) {
+                //Log.e(BluetoothActivity.class.getSimpleName(), "Could not create Insecure RFComm Connection",e);
+            }
+            return  device.createRfcommSocketToServiceRecord(mUUID);
         }
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     private class ConnectedThread extends Thread{
         private final BluetoothSocket mmSocket;
@@ -460,53 +553,10 @@ public class BluetoothActivity extends AppCompatActivity {
         public void cancel() {
             try {
                 mmSocket.close();
-            } catch (IOException e) { }
-        }
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private class ConnectThread extends Thread {
-        //private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
-
-        public ConnectThread(BluetoothDevice device) {
-            this.mmDevice = device;
-            BluetoothSocket tmp = null;
-            try {
-                tmp = device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
+                handlerBT.obtainMessage(STATE_DISCONNECT).sendToTarget();
             } catch (IOException e) {
-                e.printStackTrace();
-            }
-            mBTSocket = tmp;
-        }
-
-        @Override
-        public void run() {
- /*           setName("ConnectThread");
-            mBluetoothAdapter.cancelDiscovery();
-            try {
-                mmSocket.connect();
-            } catch (IOException e) {
-                try {
-                    mmSocket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                //connectionFailed();
-                return;
-
-            }
-            synchronized (PrinterService.this) {
-                mConnectThread = null;
-            }
-            connected(mmSocket, mmDevice);*/
-        }
-
-        public void cancel() {
-            try {
-                mBTSocket.close();
-                mBTSocket = null;
-            } catch (IOException e) {
-                Log.e("PrinterService", "close() of connect socket failed", e);
+                handlerBT.obtainMessage(STATE_DISCONNECTION_FAILED)
+                        .sendToTarget();
             }
         }
         public boolean cancel_bis() {
@@ -515,24 +565,16 @@ public class BluetoothActivity extends AppCompatActivity {
                 //mBTSocket = null;
 
             } catch(IOException e) {
-                Log.d("CONNECTTHREAD","Could not close connection:" + e.toString());
+                handlerBT.obtainMessage(STATE_DISCONNECTION_FAILED)
+                        .sendToTarget();
                 return false;
             }
             return true;
         }
-        public BluetoothSocket createBluetoothSocket(BluetoothDevice device, UUID mUUID) throws IOException {
-            try {
-                final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
-                //Method m = device.getClass().getMethod("createRfcommSocket", new Class[] { int.class });
-                return (BluetoothSocket) m.invoke(device, mUUID);
-            } catch (Exception e) {
-                //Log.e(BluetoothActivity.class.getSimpleName(), "Could not create Insecure RFComm Connection",e);
-            }
-            return  device.createRfcommSocketToServiceRecord(mUUID);
-        }
-    }
 
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -541,9 +583,6 @@ public class BluetoothActivity extends AppCompatActivity {
         @SuppressLint("SetTextI18n")
         @Override
         public boolean handleMessage(Message msg) {
-
-            byte[] buffer   = null;
-            String mensaje  = null;
 
             switch (msg.what){
                 case STATE_SEARCHING:
@@ -558,13 +597,27 @@ public class BluetoothActivity extends AppCompatActivity {
                     textView_StatusBT.setText("Conectando... handler");
                     break;
                 case STATE_CONNECTED:
-                    textView_StatusBT.setText("Conectado a: " + (String)(msg.obj));
+                    mBTname = msg.getData().getString("device_name");
+                    textView_StatusBT.setText(mBTname);
+                   // textView_StatusBT.setText("Conectado a: " + (String)(msg.obj));
                     break;
                 case STATE_CONNECTED_MAC:
-                    textView_StatusBT_MAC.setText((String)(msg.obj));
+                    mBTaddress = msg.getData().getString("device_MAC");
+                    textView_StatusBT_MAC.setText(mBTaddress);
+                    //textView_StatusBT_MAC.setText((String)(msg.obj));
+                    break;
+                case STATE_CONNECTION_FAILED:
+                    textView_StatusBT.setText("Connection Failed...handler");
                     break;
                 case STATE_DISCONNECT:
                     textView_StatusBT.setText("Desconetado...handler" );
+                    textView_StatusBT_MAC.setText("");
+                    break;
+                case STATE_CONNECTION_LOST:
+                    textView_StatusBT.setText("Conexion Perdida...handler" );
+                    break;
+                case STATE_DISCONNECTION_FAILED:
+                    textView_StatusBT.setText("Fallo en Desconexion...handler" );
                     textView_StatusBT_MAC.setText("");
                     break;
                 case STATE_BT_ON:
@@ -576,15 +629,13 @@ public class BluetoothActivity extends AppCompatActivity {
                     textView_StatusBT.setText("Apagado...handler");
                     break;
                 case STATE_FOUND:
+                    textView_StatusBT.setText("");
                     textView_StatusBT.setText("Dispositivos Encontrados ...handler");
                     break;
                 case STATE_NOT_FOUND:
                     textView_StatusBT.setText("No se encontraron Dispositivos ...handler");
                     break;
                 case STATE_TEST:
-                    break;
-                case STATE_CONNECTION_FAILED:
-                    textView_StatusBT.setText("Connection Failed...handler");
                     break;
 
                 case STATE_MESSAGE_RECEIVED:
@@ -708,26 +759,8 @@ public class BluetoothActivity extends AppCompatActivity {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void onPause() {
-        super.onPause();
-            //SharedPreferences datos = PreferenceManager.getDefaultSharedPreferences(this);
-            //.Editor miEditor = datos.edit();
-            //miEditor.putString("name",mBTname);
-            //miEditor.putString("MAC",mBTaddress);
-            //miEditor.apply();
-    }
 
-    public void onResume() {
-        super.onResume();
-        //SharedPreferences datos = PreferenceManager.getDefaultSharedPreferences(this);
 
-        //mBTaddress = datos.getString("MAC","MAC no Guardada");
-        //mBTname = datos.getString("name","Nombre no Guardado");
-        //handlerBT.obtainMessage(STATE_TEST)
-        // .sendToTarget();
-            //textView_StatusBT.setText(mBTname);
-            //textView_StatusBT_MAC.setText(mBTaddress);
-    }
 
 
 
