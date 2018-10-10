@@ -1,6 +1,5 @@
 package alex139139.controlbrazorobotico.Services;
 
-import android.app.Activity;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,44 +9,39 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.TextView;
+import android.os.Process;
+import android.support.v4.content.LocalBroadcastManager;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.UUID;
 
-import alex139139.controlbrazorobotico.R;
 
 
-public class BluetoothService_Test extends Service {
+public class BluetoothService_Test extends Service implements Serializable {
 
+    private Context context;
     //////////////////////////////////////////////////////
-    BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothSocket mBTSocket;
     private BluetoothDevice mBTDevice;
     //////////////////////////////////////////////////////
-    private static final UUID BT_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");// "random" unique identifier
-    //493489e8-785b-4fa3-8f7f-285bf74bd1e7
-    static final int STATE_DISCONNECT = 3;
-    static final int STATE_DISCONNECTION_FAILED = 4;
-    static final int STATE_CONNECTING = 5;
-    static final int STATE_CONNECTED = 6;
-    static final int STATE_CONNECTED_MAC =7;
-    static final int STATE_CONNECTION_FAILED = 8;
-    static final int STATE_CONNECTION_LOST = 9;
-    static final int STATE_MESSAGE_RECEIVED = 15;
-
     // Constants that indicate the current connection state
     public static final int S_STATE_NONE = 0;       // we're doing nothing
     public static final int S_STATE_LISTEN = 1;     // now listening for incoming connections
     public static final int S_STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int S_STATE_CONNECTED = 3; // now connected to a remote device
+
+    public final static String ACTION_BT_SERVICE_NONE = ".Services.BluetoothService_TesT.ACTION_BT_SERVICE_NONE";
+    public final static String ACTION_BT_SERVICE_CONNECTING = ".Services.BluetoothService_TesT.ACTION_BT_SERVICE_CONNECTING";
+    public final static String ACTION_BT_SERVICE_CONNECTED = ".Services.BluetoothService_TesT.ACTION_BT_SERVICE_CONNECTED";
+
     private int mState;
 
     //////////////////////////////////////////////////////
@@ -59,54 +53,85 @@ public class BluetoothService_Test extends Service {
     //////////////////////////////////////////////////////
     private static final UUID mBTUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");// "random" unique identifier
     //493489e8-785b-4fa3-8f7f-285bf74bd1e7
-
     //////////////////////////////////////////////////////
 
-
-    private Context context;
-
-    public BluetoothService_Test(){
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public BluetoothService_Test() {
 
     }
-
-    public BluetoothService_Test(Context c,Handler handler){
-        mBluetoothAdapter =BluetoothAdapter.getDefaultAdapter();
+    public BluetoothService_Test(Context c, Handler handler) {
         mState = S_STATE_NONE;
         mHandler = handler;
         this.context = c;
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private CountHandler mServiceHandler;
 
+    private final class CountHandler extends Handler{
+        CountHandler(Looper looper){
+            super(looper);
+        }
+        @Override
+        public void handleMessage(Message msg){
+            Intent request = (Intent) msg.obj;
+            String address = request.getStringExtra("device_address");
+            int starId =msg.arg1;
+            if (address != null){
+                mBluetoothAdapter =BluetoothAdapter.getDefaultAdapter();
+                mBTDevice = mBluetoothAdapter.getRemoteDevice(address);
+                connect(mBTDevice);
+                connectionStates();
+            }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+            //se destruye a si mismo
+            //boolean stopped =stopSelfResult(starId);
+            // stop(starId);
+        }
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onCreate() {
+        super.onCreate();
+        HandlerThread backgroundThread  = new HandlerThread("CounterThread",
+                Process.THREAD_PRIORITY_BACKGROUND);
+        backgroundThread .start();
 
-        //Log.d(TAG, "Servicio creado...");
+        mServiceHandler =  new CountHandler(backgroundThread.getLooper());
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //Log.d(TAG, "Servicio iniciado...");
-
+        //Log.d(TAG, "Servicio iniciado...")
+        //if(intent != null){}
+        Message msg = mServiceHandler.obtainMessage();
+        msg.arg1 = startId;
+        msg.obj = intent;
+        mServiceHandler.sendMessage(msg);
         return START_NOT_STICKY;
     }
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onDestroy() {
-        //Log.d(TAG, "Servicio destruido...");
+        stop();
     }
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public synchronized void start() {
-
         // Cancel any thread attempting to make a connection
         if (mConnectThread != null) {
             mConnectThread.cancel();
             mConnectThread = null;
         }
-
         // Cancel any thread currently running a connection
         if (mConnectedThread != null) {
             mConnectedThread.cancel();
@@ -114,9 +139,8 @@ public class BluetoothService_Test extends Service {
         }
 
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public synchronized void connect(BluetoothDevice device) {
-
-
         // Cancel any thread attempting to make a connection
         if (mState == S_STATE_CONNECTING) {
             if (mConnectThread != null) {
@@ -124,19 +148,33 @@ public class BluetoothService_Test extends Service {
                 mConnectThread = null;
             }
         }
-
         // Cancel any thread currently running a connection
         if (mConnectedThread != null) {
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
-
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(device);
         mConnectThread.start();
-        // Update UI titleupdateUserInterfaceTitle();
     }
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Write to the ConnectedThread in an unsynchronized manner
+     *
+     * @param out The bytes to write
+     * @see ConnectedThread#write(byte[])
+     */
+    public void write(byte[] out) {
+        // Create temporary object
+        ConnectedThread r;
+        // Synchronize a copy of the ConnectedThread
+        synchronized (this) {
+            if (mState != S_STATE_CONNECTED) return;
+            r = mConnectedThread;
+        }
+        // Perform the write unsynchronized
+        r.write(out);
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public synchronized void stop() {
 
@@ -153,80 +191,62 @@ public class BluetoothService_Test extends Service {
         mState = S_STATE_NONE;
         // Update UI title
 
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * Write to the ConnectedThread in an unsynchronized manner
-     *
-     * @param out The bytes to write
-     * @see ConnectedThread#write(byte[])
-     */
 
-    public void write(byte[] out) {
-        // Create temporary object
-        ConnectedThread r;
-        // Synchronize a copy of the ConnectedThread
-        synchronized (this) {
-            if (mState != STATE_CONNECTED) return;
-            r = mConnectedThread;
-        }
-        // Perform the write unsynchronized
-        r.write(out);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public synchronized int getState() {
         return mState;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public synchronized void connected(BluetoothSocket socket, BluetoothDevice
-            device) {
-
+    public synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
         // Cancel the thread that completed the connection
         if (mConnectThread != null) {
             mConnectThread.cancel();
             mConnectThread = null;
         }
-
         // Cancel any thread currently running a connection
         if (mConnectedThread != null) {
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
-
         // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
-
-        // Send the name of the connected device back to the UI Activity
-
-        Message msg =mHandler.obtainMessage(STATE_CONNECTED);
-        Bundle bundle = new Bundle();
-        bundle.putString("device_name",device.getName());
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
-        Message msg2 =mHandler.obtainMessage(STATE_CONNECTED_MAC);
-        Bundle bundle2 = new Bundle();
-        bundle2.putString("device_MAC",device.getAddress());
-        msg2.setData(bundle2);
-        mHandler.sendMessage(msg2);
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    public synchronized BluetoothDevice get_device(Handler mHandler){
+//        if(mBTDevice == null){
+//            return null;
+//        }else{
+//            Message msg =mHandler.obtainMessage(STATE_CONNECTED);
+//            Bundle bundle = new Bundle();
+//            bundle.putString("device_name",mBTDevice.getName());
+//            msg.setData(bundle);
+//            mHandler.sendMessage(msg);
+//            Message msg2 =mHandler.obtainMessage(STATE_CONNECTED_MAC);
+//            Bundle bundle2 = new Bundle();
+//            bundle2.putString("device_MAC",mBTDevice.getAddress());
+//            msg2.setData(bundle2);
+//            mHandler.sendMessage(msg2);
+//            return mBTDevice;
+//        }
+//
+//    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void connectionLost() {
         // Send a failure message back to the Activity
-        mHandler.obtainMessage(STATE_CONNECTION_LOST).
-                sendToTarget();
+        //mHandler.obtainMessage(STATE_CONNECTION_LOST).sendToTarget();
         mState = S_STATE_NONE;
         // Update UI title
-
-
         // Start the service over to restart listening mode
         BluetoothService_Test.this.start();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void connectionFailed() {
         // Send a failure message back to the Activity
-        mHandler.obtainMessage(STATE_CONNECTION_FAILED)
-                .sendToTarget();
+       // mHandler.obtainMessage(STATE_CONNECTION_FAILED).sendToTarget();
 
         mState = S_STATE_NONE;
         // Update UI title
@@ -236,31 +256,9 @@ public class BluetoothService_Test extends Service {
         BluetoothService_Test.this.start();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     private class ConnectThread extends Thread {
         private BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
-        //private final String mmAddress;
-        //private  final String mmName;
-        //private  final UUID mmUUID;
-
-
-//        public ConnectThread(BluetoothDevice device,final String name, final String address,UUID uuid) {
-//                this.mmAddress = address;
-//                this.mmName = name;
-//                this.mmDevice = device;
-//                //this.mmSocket = socket;
-//                this.mmUUID = uuid;
-//                BluetoothSocket tmp = null;
-//                try {
-//                    tmp = mmDevice.createRfcommSocketToServiceRecord(mmUUID);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                //mmSocket = tmp;
-//                mBTSocket = tmp;
-//        }
 
         public ConnectThread(BluetoothDevice device) {
 
@@ -274,8 +272,7 @@ public class BluetoothService_Test extends Service {
             //mmSocket = tmp;
             mBTSocket = tmp;
             mState = S_STATE_CONNECTING;
-            mHandler.obtainMessage(STATE_CONNECTING)
-                    .sendToTarget();
+            //mHandler.obtainMessage(STATE_CONNECTING).sendToTarget();
         }
 
         @Override
@@ -319,15 +316,14 @@ public class BluetoothService_Test extends Service {
                 //mBTSocket = null;
 
             } catch (IOException e) {
-                mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
+                //mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
             }
         }
         public boolean cancel_bis() {
             try {
                 mBTSocket.close();
-                //mBTSocket = null;
             } catch(IOException e) {
-                mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
+               // mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
                 return false;
             }
             return true;
@@ -343,8 +339,6 @@ public class BluetoothService_Test extends Service {
 //            return  device.createRfcommSocketToServiceRecord(mUUID);
 //        }
     }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     private class ConnectedThread extends Thread{
        // private final BluetoothSocket mmSocket;
@@ -379,8 +373,7 @@ public class BluetoothService_Test extends Service {
                     //bytes = mmInStream.available();
 
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(STATE_MESSAGE_RECEIVED, bytes, -1, buffer)
-                            .sendToTarget();
+                   // mHandler.obtainMessage(STATE_MESSAGE_RECEIVED, bytes, -1, buffer).sendToTarget();
                     if(bytes != 0) {
 
                     }
@@ -404,9 +397,9 @@ public class BluetoothService_Test extends Service {
         public void cancel() {
             try {
                 mBTSocket.close();
-                mHandler.obtainMessage(STATE_DISCONNECT).sendToTarget();
+               // mHandler.obtainMessage(STATE_DISCONNECT).sendToTarget();
             } catch (IOException e) {
-                mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
+               // mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
             }
         }
         public boolean cancel_bis() {
@@ -414,15 +407,38 @@ public class BluetoothService_Test extends Service {
                 mBTSocket.close();
                 //mBTSocket = null;
             } catch(IOException e) {
-                mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
+                //mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
                 return false;
             }
             return true;
         }
 
     }
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private void connectionStates(){
+        sendBroadcast(mState);
+    }
+
+    private void sendBroadcast(int state){
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(BluetoothService_Test.this);
+        switch (state){
+            case S_STATE_NONE:
+                Intent resultIntent1 = new Intent(ACTION_BT_SERVICE_NONE);
+                //resultIntent1.putExtra("Valor1",1);
+                broadcastManager.sendBroadcast(resultIntent1);
+
+                break;
+            case S_STATE_CONNECTING:
+                Intent resultIntent2 = new Intent(ACTION_BT_SERVICE_CONNECTING);
+                broadcastManager.sendBroadcast(resultIntent2);
+                break;
+            case S_STATE_CONNECTED:
+                Intent resultIntent3 = new Intent(ACTION_BT_SERVICE_CONNECTED);
+
+                broadcastManager.sendBroadcast(resultIntent3);
+                break;
+        }
+    }
 
 }

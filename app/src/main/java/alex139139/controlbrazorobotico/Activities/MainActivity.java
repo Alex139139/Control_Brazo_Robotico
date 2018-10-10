@@ -14,11 +14,12 @@ import android.widget.Toast;
 
 
 import alex139139.controlbrazorobotico.R;
-
+import alex139139.controlbrazorobotico.Services.BluetoothService_Test;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener,View.OnTouchListener {
 
+    private BluetoothService_Test mBTService = null;
     private String GradosMotor_StringM1 = "179";
     private String GradosMotor_StringM2 = "80";
     private String GradosMotor_StringM3 = "50";
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+       // mBTService =new BluetoothService_Test(this,handlerBT);
 
         switch_M1 = (Switch)findViewById(R.id.switch_Motor1);
         switch_M2 = (Switch)findViewById(R.id.switch_Motor2);
