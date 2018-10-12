@@ -5,8 +5,11 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -24,7 +27,7 @@ import java.util.UUID;
 
 
 
-public class BluetoothService_Test extends Service implements Serializable {
+public class BluetoothService_Test extends Service {
 
     private Context context;
     //////////////////////////////////////////////////////
@@ -42,7 +45,7 @@ public class BluetoothService_Test extends Service implements Serializable {
     public static final int S_STATE_CONNECTED = 3; // now connected to a remote device
     public static final int S_STATE_CONENECTION_LOST = 4;
     public static final int S_STATE_CONNECTION_FAILED = 5;
-    public static final int S_STATE_DISCONNECTED = 6;       // we're doing nothing
+    public static final int S_STATE_DISCONNECTED = 6;
 
     public static final String CANONICAL_NAME = BluetoothService_Test.class.getCanonicalName();
 
@@ -55,7 +58,7 @@ public class BluetoothService_Test extends Service implements Serializable {
     public final static String ACTION_BT_SERVICE_CONNECTED = "BuetoothServisce_Test.ACTION_BT_SERVICE_CONNECTED";
     public final static String ACTION_BT_SERVICE_CONNECTION_LOST = "BuetoothServisce_Test.ACTION_BT_SERVICE_CONNECTION_LOST";
     public final static String ACTION_BT_SERVICE_CONNECTION_FAILED = "BuetoothServisce_Test.ACTION_BT_SERVICE_CONNECTION_FAILED";
-    private int mState;
+    public int mState;
 
     //////////////////////////////////////////////////////
     private ConnectedThread mConnectedThread;
@@ -63,6 +66,7 @@ public class BluetoothService_Test extends Service implements Serializable {
 
     //////////////////////////////////////////////////////
     private Handler mHandler;
+    private Runnable periodicState;
     //////////////////////////////////////////////////////
     private static final UUID mBTUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");// "random" unique identifier
     //493489e8-785b-4fa3-8f7f-285bf74bd1e7
@@ -70,9 +74,8 @@ public class BluetoothService_Test extends Service implements Serializable {
     public BluetoothService_Test() {
 
     }
-    public BluetoothService_Test(Context c, Handler handler) {
+    public BluetoothService_Test(Context c) {
         mState = S_STATE_NONE;
-        mHandler = handler;
         this.context = c;
     }
 
@@ -94,13 +97,14 @@ public class BluetoothService_Test extends Service implements Serializable {
                 mBTDevice = mBluetoothAdapter.getRemoteDevice(address);
                 connect(mBTDevice);
 
+               //getState ();
             }
             //se destruye a si mismo
             //boolean stopped =stopSelfResult(starId);
             // stop(starId);
         }
     }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onCreate() {
@@ -110,8 +114,6 @@ public class BluetoothService_Test extends Service implements Serializable {
         backgroundThread .start();
         mServiceHandler =  new CountHandler(backgroundThread.getLooper());
         localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
-
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -136,6 +138,8 @@ public class BluetoothService_Test extends Service implements Serializable {
     public IBinder onBind(Intent intent) {
         return null;
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public synchronized void start() {
         // Cancel any thread attempting to make a connection
@@ -192,8 +196,6 @@ public class BluetoothService_Test extends Service implements Serializable {
 
 
         // Update UI title
-
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public synchronized void connect(BluetoothDevice device) {
@@ -230,13 +232,8 @@ public class BluetoothService_Test extends Service implements Serializable {
         mConnectedThread.start();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public synchronized int getState (){
-        return mState;
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void connectionLost() {
         // Send a failure message back to the Activity
-        //mHandler.obtainMessage(STATE_CONNECTION_LOST).sendToTarget();
         mState = S_STATE_CONENECTION_LOST;
         // Update UI title
         Intent resultIntent = new Intent(ACTION_BT_SERVICE_CONNECTION_LOST);
@@ -301,8 +298,6 @@ public class BluetoothService_Test extends Service implements Serializable {
                 }
                 // Reset the ConnectThread because we're done
                 connected(mBTSocket);
-                //mHandler.obtainMessage(STATE_CONNECTED, mmName).sendToTarget();
-                //mHandler.obtainMessage(STATE_CONNECTED_MAC,mmAddress).sendToTarget();
             }else{
                 connectionFailed();
                 return;
@@ -317,14 +312,13 @@ public class BluetoothService_Test extends Service implements Serializable {
                 //mBTSocket = null;
 
             } catch (IOException e) {
-                //mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
+
             }
         }
         public boolean cancel_bis() {
             try {
                 mBTSocket.close();
             } catch(IOException e) {
-               // mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
                 return false;
             }
             return true;
@@ -347,6 +341,7 @@ public class BluetoothService_Test extends Service implements Serializable {
         private final OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket){
+
             mBTSocket = socket;
             //mmSocket = socket;
             InputStream tempIn = null;
@@ -360,6 +355,9 @@ public class BluetoothService_Test extends Service implements Serializable {
             }
             mmInStream = tempIn;
             mmOutStream = temOut;
+            mState = S_STATE_CONNECTED;
+
+
             mState = S_STATE_CONNECTED;
             String nameDevice = mBTDevice.getName();
             String nameAddress = mBTDevice.getAddress();
@@ -380,7 +378,7 @@ public class BluetoothService_Test extends Service implements Serializable {
                     //bytes = mmInStream.available();
 
                     // Send the obtained bytes to the UI Activity
-                   // mHandler.obtainMessage(STATE_MESSAGE_RECEIVED, bytes, -1, buffer).sendToTarget();
+
                     if(bytes != 0) {
 
                     }
@@ -404,9 +402,9 @@ public class BluetoothService_Test extends Service implements Serializable {
         public void cancel() {
             try {
                 mBTSocket.close();
-               // mHandler.obtainMessage(STATE_DISCONNECT).sendToTarget();
+
             } catch (IOException e) {
-               // mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
+
             }
         }
         public boolean cancel_bis() {
@@ -414,7 +412,7 @@ public class BluetoothService_Test extends Service implements Serializable {
                 mBTSocket.close();
                 //mBTSocket = null;
             } catch(IOException e) {
-                //mHandler.obtainMessage(STATE_DISCONNECTION_FAILED).sendToTarget();
+
                 return false;
             }
             return true;
@@ -423,3 +421,5 @@ public class BluetoothService_Test extends Service implements Serializable {
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
+
+

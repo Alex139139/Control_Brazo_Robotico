@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Messenger;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -28,8 +29,6 @@ import java.io.Serializable;
 
 import java.util.Set;
 
-import alex139139.controlbrazorobotico.Classs.MyBroadcastReciver;
-import alex139139.controlbrazorobotico.Classs.mHandler;
 import alex139139.controlbrazorobotico.Manifest;
 import alex139139.controlbrazorobotico.R;
 import alex139139.controlbrazorobotico.Services.BluetoothService_Test;
@@ -102,14 +101,15 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
     @Override
     public void onStart() {
         super.onStart();
+        mBTService= new BluetoothService_Test(this);
         filtros_ACTION_BT();
-        mBTService= new BluetoothService_Test(this,handlerBT);
-
+        EstadoInicial_UI();
+        EventosBTservice();
     }
     @Override
     public void onStop(){
         super.onStop();
-        unregisterReceiver(broadcastReceiver); //Al salir de la app ya no recibe los registros
+        //unregisterReceiver(broadcastReceiver); //Al salir de la app ya no recibe los registros
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -119,10 +119,7 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
 
-        //broadcastReceiver = new MyBroadcastReciver();
 
-        //mHandler handlerBT =new mHandler(textView_StatusBT,textView_StatusBT_MAC,button_Conect,button_Scan);
-        //BluetoothManager mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
 
@@ -131,15 +128,10 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
         localBroadcastManager = LocalBroadcastManager.getInstance(BluetoothActivity.this);
 
         inicializacion();
-        EstadoInicial_UI();
-        EventosBTservice();
 
         ListView_Device.setOnItemClickListener(mDeviceClickListener);
         ListView_DeviceE.setOnItemClickListener(mDeviceClickListener);
         textView_StatusBT.setOnLongClickListener(mDeviceLongClickListener);
-
-
-
 
         if (mArrayAdapter == null) {
             // Device does not support Bluetooth
@@ -216,10 +208,8 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void EstadoInicial_UI(){
-        if (mBluetoothAdapter.isEnabled()) {
-            handlerBT.obtainMessage(STATE_BT_ON)
-                    .sendToTarget();
-            listPairedDevices();
+        if (mBluetoothAdapter.isEnabled()){
+
         } else if (!mBluetoothAdapter.isEnabled()) {
             handlerBT.obtainMessage(STATE_BT_OFF)
                     .sendToTarget();
@@ -297,6 +287,8 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
             }
 
             if(BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
+                Intent intentStopBTService = new Intent(getApplicationContext(),BluetoothService_Test.class);
+                stopService(intentStopBTService);
                 mArrayAdapter2.clear();
                 handlerBT.obtainMessage(STATE_SEARCHING)
                         .sendToTarget();
@@ -314,6 +306,8 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                 final int estado = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
                 switch (estado) {
                     case BluetoothAdapter.STATE_OFF:
+                        Intent intentStopBTService = new Intent(getApplicationContext(),BluetoothService_Test.class);
+                        stopService(intentStopBTService);
                         mArrayAdapter.clear();
                         mArrayAdapter2.clear();
                         handlerBT.obtainMessage(STATE_BT_OFF)
@@ -350,7 +344,7 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                         .sendToTarget();
             }
             if(BluetoothService_Test.ACTION_BT_SERVICE_CONNECTION_FAILED.equals(actionService)){
-                handlerBT.obtainMessage(STATE_CONNECTION_FAILED)
+                handlerBT.obtainMessage( STATE_CONNECTION_FAILED)
                         .sendToTarget();
             }
             if(BluetoothService_Test.ACTION_BT_SERVICE_DISCONNECTED.equals(actionService)){
@@ -400,6 +394,8 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
             }else{
                 Toast.makeText(getBaseContext(), "Dispositivo Conectado", Toast.LENGTH_SHORT).show();
             }
+
+
         }
     };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -449,17 +445,22 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                 case STATE_BT_ON:
                     ((Button) findViewById(R.id.button_Conect_id)).setText(R.string.apagar_bluetooth);
                     textView_StatusBT.setText("Encendido...handler");
+                    textView_StatusBT_MAC.setText("");
                     break;
                 case STATE_BT_OFF:
+                    Intent intentStopBTService = new Intent(getApplicationContext(),BluetoothService_Test.class);
+                    stopService(intentStopBTService);
                     ((Button) findViewById(R.id.button_Conect_id)).setText(R.string.encender_bluetooth);
                     textView_StatusBT.setText("Apagado...handler");
+                    textView_StatusBT_MAC.setText("");
                     break;
                 case STATE_FOUND:
-                    textView_StatusBT.setText("");
+                    textView_StatusBT_MAC.setText("");
                     textView_StatusBT.setText("Dispositivos Encontrados ...handler");
                     break;
                 case STATE_NOT_FOUND:
                     textView_StatusBT.setText("No se encontraron Dispositivos ...handler");
+                    textView_StatusBT_MAC.setText("");
                     break;
                 case STATE_TEST:
                     break;
@@ -583,6 +584,8 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 }// cierre del activity
 
