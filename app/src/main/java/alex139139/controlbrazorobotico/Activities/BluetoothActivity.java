@@ -82,10 +82,11 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
     private String mBTname;
     ////////////////////////////////////////////
     LocalBroadcastManager localBroadcastManager;
-    //private BroadcastReceiver broadcastReceiver;
-    //private BroadcastReceiver broadcastReceiverBT;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onDestroy(){
@@ -101,10 +102,10 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
     @Override
     public void onStart() {
         super.onStart();
-        mBTService= new BluetoothService_Test(this);
+        mBTService= new BluetoothService_Test();
         filtros_ACTION_BT();
-        EstadoInicial_UI();
         EventosBTservice();
+        EstadoInicial_UI();
     }
     @Override
     public void onStop(){
@@ -209,7 +210,8 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void EstadoInicial_UI(){
         if (mBluetoothAdapter.isEnabled()){
-
+            handlerBT.obtainMessage(STATE_BT_ON)
+                    .sendToTarget();
         } else if (!mBluetoothAdapter.isEnabled()) {
             handlerBT.obtainMessage(STATE_BT_OFF)
                     .sendToTarget();
@@ -314,7 +316,6 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                                 .sendToTarget();
                         break;
                     case BluetoothAdapter.STATE_ON:
-                        listPairedDevices();
                         handlerBT.obtainMessage(STATE_BT_ON)
                                 .sendToTarget();
                         break;
@@ -443,6 +444,7 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                     textView_StatusBT_MAC.setText("");
                     break;
                 case STATE_BT_ON:
+                    listPairedDevices();
                     ((Button) findViewById(R.id.button_Conect_id)).setText(R.string.apagar_bluetooth);
                     textView_StatusBT.setText("Encendido...handler");
                     textView_StatusBT_MAC.setText("");

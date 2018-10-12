@@ -7,7 +7,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import alex139139.controlbrazorobotico.Classs.MyBroadcastReciver;
+
 import alex139139.controlbrazorobotico.R;
 
 public class BluetoothFragmentActivitie extends AppCompatActivity {
@@ -19,10 +19,6 @@ public class BluetoothFragmentActivitie extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_fragment_activitie);
 
-        broadcastReceiver = new MyBroadcastReciver();
-        Intent intent = new Intent();
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.setAction(".BluetoothService_TesT.ACTION_BT_SERVICE_NONE");
     }
 
     @Override

@@ -16,8 +16,10 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Messenger;
 import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +48,10 @@ public class BluetoothService_Test extends Service {
     public static final int S_STATE_CONENECTION_LOST = 4;
     public static final int S_STATE_CONNECTION_FAILED = 5;
     public static final int S_STATE_DISCONNECTED = 6;
+    //////////////////////////////////////////////////////
+    public static final int RETURN_STATE = 1;
 
+    //////////////////////////////////////////////////////
     public static final String CANONICAL_NAME = BluetoothService_Test.class.getCanonicalName();
 
     //public final static String ACTION_BT_SERVICE_NONE = CANONICAL_NAME + ".ACTION_BT_SERVICE_NONE";
@@ -104,7 +109,25 @@ public class BluetoothService_Test extends Service {
             // stop(starId);
         }
     }
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    class MessageHandler extends Handler{
+        public void handleMessage(Message msg){
+            switch (msg.what){
+                case RETURN_STATE:
+                    Toast.makeText(getApplicationContext(),"Estado",Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    }
+    Messenger messenger = new Messenger(new MessageHandler());
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public IBinder onBind(Intent intent) {
+        return messenger.getBinder();
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onCreate() {
@@ -133,13 +156,6 @@ public class BluetoothService_Test extends Service {
         //localBroadcastManager.sendBroadcast(resultIntent);
         stop();
     }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public synchronized void start() {
         // Cancel any thread attempting to make a connection
