@@ -387,30 +387,6 @@ public class BluetoothService_Test extends Service {
         }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * Write to the ConnectedThread in an unsynchronized manner
-     *
-     * @param out The bytes to write
-     * @see ConnectedThread#write(byte[])
-     */
-    public  void write(byte[] out) {
-        // Create temporary object
-        ConnectedThread r;
-        // Synchronize a copy of the ConnectedThread
-        synchronized (this) {
-            if (mState != S_STATE_CONNECTED){
-                return;
-            }
-            else{
-                r = mConnectedThread;
-                connectionFailed();
-            }
-        }
-
-        // Perform the write unsynchronized
-        r.write(out);
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     class IncomingHandler  extends Handler{
@@ -449,31 +425,37 @@ public class BluetoothService_Test extends Service {
                 case SEND_DATA_M1:
                     int Grados_M1 = msg.arg1;
                     String Grados = String.valueOf(Grados_M1);
+                    Grados = "A" + Grados + "#";
                     mConnectedThread.write(Grados.getBytes());
                     break;
                 case SEND_DATA_M2:
                     int Grados_M2 = msg.arg1;
                     String Grados2 = String.valueOf(Grados_M2);
+                    Grados2 = "B" + Grados2 + "#";
                     mConnectedThread.write(Grados2.getBytes());
                     break;
                 case SEND_DATA_M3:
                     int Grados_M3 = msg.arg1;
                     String Grados3 = String.valueOf(Grados_M3);
+                    Grados3 = "C" + Grados3 + "#";
                     mConnectedThread.write(Grados3.getBytes());
                     break;
                 case SEND_DATA_M4:
                     int Grados_M4 = msg.arg1;
                     String Grados4 = String.valueOf(Grados_M4);
+                    Grados = "D" + Grados4 + "#";
                     mConnectedThread.write(Grados4.getBytes());
                     break;
                 case SEND_DATA_M5:
                     int Grados_M5 = msg.arg1;
                     String Grados5 = String.valueOf(Grados_M5);
+                    Grados5 = "E" + Grados5 + "#";
                     mConnectedThread.write(Grados5.getBytes());
                     break;
                 case SEND_DATA_M6:
                     int Grados_M6 = msg.arg1;
                     String Grados6 = String.valueOf(Grados_M6);
+                    Grados6 = "F" + Grados6 + "#";
                     mConnectedThread.write(Grados6.getBytes());
                     break;
                 case SEND_DATA:

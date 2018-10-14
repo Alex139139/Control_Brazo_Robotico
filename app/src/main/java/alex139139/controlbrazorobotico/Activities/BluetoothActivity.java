@@ -134,9 +134,9 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
             button_Disconnect.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Intent intent = new Intent(BluetoothActivity.this,MainActivity.class);
-                    //startActivity(intent);
-                    if(statusBound){
+                    Intent intent = new Intent(BluetoothActivity.this,MainActivity.class);
+                    startActivity(intent);
+                    /*if(statusBound){
                         if(statusConnection){
                             Message message = Message.obtain(null,BluetoothService_Test.SEND_DATA,0,0);
                             try {
@@ -145,7 +145,7 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                                 e.printStackTrace();
                             }
                         }
-                    }
+                    }*/
                 }
             });
 
