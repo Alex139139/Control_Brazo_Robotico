@@ -19,7 +19,9 @@ import alex139139.controlbrazorobotico.Services.BluetoothService_Test;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener,View.OnTouchListener {
 
-    private BluetoothService_Test mBTService = null;
+
+
+    private BluetoothService_Test mBTService = new BluetoothService_Test(MainActivity.this);
     private String GradosMotor_StringM1 = "179";
     private String GradosMotor_StringM2 = "80";
     private String GradosMotor_StringM3 = "50";
@@ -158,6 +160,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         button_less_M5.setOnLongClickListener(this);
         button_less_M6.setOnLongClickListener(this);
         button_less_M1.setOnLongClickListener(this);
+
+       // mBTService.write();
 
     }//Cierre Funcion onCreate
 

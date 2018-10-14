@@ -6,13 +6,18 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
+import android.renderscript.RenderScript;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -76,42 +81,18 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
     static final int STATE_TEST = 14;
     static final int STATE_MESSAGE_RECEIVED = 15;
 
+    static final int STATE_UNBOUND = 20;
+
     private static int REQUEST_ENABLE_BT = 1;
     ////////////////////////////////////////////
     private String mBTaddress;
     private String mBTname;
+    boolean statusBound = false;
+    boolean statusConnection =false;
+    Messenger mMessenger = null;
     ////////////////////////////////////////////
     LocalBroadcastManager localBroadcastManager;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        Toast.makeText(this,"Destruido",Toast.LENGTH_SHORT).show();
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onStart() {
-        super.onStart();
-        mBTService= new BluetoothService_Test();
-        filtros_ACTION_BT();
-        EventosBTservice();
-        EstadoInicial_UI();
-    }
-    @Override
-    public void onStop(){
-        super.onStop();
-        //unregisterReceiver(broadcastReceiver); //Al salir de la app ya no recibe los registros
-    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,23 +101,34 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
 
-
         mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
 
         mArrayAdapter = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
         mArrayAdapter2 = new ArrayAdapter<String>(BluetoothActivity.this,android.R.layout.simple_list_item_1);
         localBroadcastManager = LocalBroadcastManager.getInstance(BluetoothActivity.this);
-
         inicializacion();
 
         ListView_Device.setOnItemClickListener(mDeviceClickListener);
         ListView_DeviceE.setOnItemClickListener(mDeviceClickListener);
         textView_StatusBT.setOnLongClickListener(mDeviceLongClickListener);
+        if(statusBound){
+            Message message = Message.obtain(null,BluetoothService_Test.RETURN_STATE,0,0);
+            message.replyTo = inMessenger;
+            try {
+                mMessenger.send(message);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+
 
         if (mArrayAdapter == null) {
             // Device does not support Bluetooth
-           // mBluetoothStatus.setText("Status: Bluetooth not found");
+            // mBluetoothStatus.setText("Status: Bluetooth not found");
             Toast.makeText(getApplicationContext(),"Bluetooth device not found!",Toast.LENGTH_SHORT).show();
         }
         else {
@@ -155,15 +147,61 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
             button_Disconnect.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //mBTaddress = null;
-                    Intent intent = new Intent(BluetoothActivity.this,MainActivity.class);
-                    startActivity(intent);
+                    //Intent intent = new Intent(BluetoothActivity.this,MainActivity.class);
+                    //startActivity(intent);
+                    int  algo = BluetoothService_Test.SEND_DATA;
+                    if(statusBound){
+                        if(statusConnection){
+                            Message message = Message.obtain(null,BluetoothService_Test.SEND_DATA,0,0);
+                            try {
+                                mMessenger.send(message);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
             });
 
         }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Toast.makeText(this,"Destruido",Toast.LENGTH_SHORT).show();
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onResume() {
+        super.onResume();
 
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onStart() {
+        super.onStart();
+        mBTService= new BluetoothService_Test();
+        Intent intentBTService = new Intent(BluetoothActivity.this, BluetoothService_Test.class);
+        bindService(intentBTService,mConnection,BIND_AUTO_CREATE);
+        statusBound = true;
+        filtros_ACTION_BT();
+        EventosBTservice();
+        EstadoInicial_UI();
+
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onStop(){
+        super.onStop();
+        if(statusBound){
+            unbindService(mConnection);
+            statusBound = false;
+        }
+
+        //unregisterReceiver(broadcastReceiver); //Al salir de la app ya no recibe los registros
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     //// En Lee el requestCode que se origina un activity//////////////////////////////////////////////////
     @Override
@@ -212,6 +250,7 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
         if (mBluetoothAdapter.isEnabled()){
             handlerBT.obtainMessage(STATE_BT_ON)
                     .sendToTarget();
+
         } else if (!mBluetoothAdapter.isEnabled()) {
             handlerBT.obtainMessage(STATE_BT_OFF)
                     .sendToTarget();
@@ -244,7 +283,6 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void discover(){
-
         if(mBluetoothAdapter.isDiscovering()){
             mBluetoothAdapter.cancelDiscovery();
         }
@@ -287,7 +325,6 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                     //textView_StatusBT.setText("Conectado a: " + name);
                     //Toast.makeText(getApplicationContext(),name,Toast.LENGTH_SHORT).show();
             }
-
             if(BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
                 Intent intentStopBTService = new Intent(getApplicationContext(),BluetoothService_Test.class);
                 stopService(intentStopBTService);
@@ -345,7 +382,7 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                         .sendToTarget();
             }
             if(BluetoothService_Test.ACTION_BT_SERVICE_CONNECTION_FAILED.equals(actionService)){
-                handlerBT.obtainMessage( STATE_CONNECTION_FAILED)
+                handlerBT.obtainMessage(STATE_CONNECTION_FAILED)
                         .sendToTarget();
             }
             if(BluetoothService_Test.ACTION_BT_SERVICE_DISCONNECTED.equals(actionService)){
@@ -362,52 +399,21 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
         myFilter.addAction(BluetoothService_Test.ACTION_BT_SERVICE_CONNECTION_LOST);
         myFilter.addAction(BluetoothService_Test.ACTION_BT_SERVICE_CONNECTION_FAILED);
         localBroadcastManager.registerReceiver(myBroadcastReceiver,myFilter);
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private AdapterView.OnLongClickListener mDeviceLongClickListener =new AdapterView.OnLongClickListener(){
-        @Override
-        public boolean onLongClick(View v) {
-            Intent intentStopBTService = new Intent(getApplicationContext(),BluetoothService_Test.class);
-            stopService(intentStopBTService);
-            mBTaddress=null;
-            mBTname=null;
-            return false;
-        }
-    };
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private  AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            String info = ((TextView) view).getText().toString();
-            //mBluetoothAdapter.cancelDiscovery(); //Revisar esto
-            final String address = info.substring(info.length() - 17);
-            final String name = info.substring(0,info.length() - 17);
-            if(!address.equals(mBTaddress)){
-                //BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-                // Only if the state is STATE_NONE, do we know that we haven't started already
-               // if(mBTService.getState() == 0){}
-                if(mBTService != null){
-                    Intent intentBTService = new Intent(BluetoothActivity.this,BluetoothService_Test.class);
-                    intentBTService.putExtra("device_address",address);
-                    startService(intentBTService);
-                }
-            }else{
-                Toast.makeText(getBaseContext(), "Dispositivo Conectado", Toast.LENGTH_SHORT).show();
-            }
 
-
-        }
-    };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     private final Handler handlerBT = new Handler( new Handler.Callback() {
-
         @SuppressLint("SetTextI18n")
         @Override
         public boolean handleMessage(Message msg) {
 
             switch (msg.what){
                 case STATE_SEARCHING:
+                    if(statusBound){
+                        unbindService(mConnection);
+                        statusBound = false;
+                    }
                     ((Button) findViewById(R.id.button_scan_id)).setText(R.string.cancelar);
                     textView_StatusBT_MAC.setText("");
                     textView_StatusBT.setText("Buscando ...handler");
@@ -419,21 +425,33 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                     textView_StatusBT.setText("Conectando... handler");
                     break;
                 case STATE_CONNECTED:
+                    statusConnection = true;
                     textView_StatusBT.setText("Conectado a: " + (String)(msg.obj));
                     break;
                 case STATE_CONNECTED_MAC:
                     textView_StatusBT_MAC.setText((String)(msg.obj));
                     break;
                 case STATE_CONNECTION_FAILED:
+                    statusConnection = false;
+                    if(statusBound){
+                        unbindService(mConnection);
+                        statusBound = false;
+                    }
                     textView_StatusBT.setText("Connection Failed...handler");
                     mBTaddress=null;
                     mBTname=null;
                     break;
                 case STATE_DISCONNECT:
+                    statusConnection = false;
                     textView_StatusBT.setText("Desconetado...handler" );
                     textView_StatusBT_MAC.setText("");
                     break;
                 case STATE_CONNECTION_LOST:
+                    statusConnection = false;
+                    if(statusBound){
+                        unbindService(mConnection);
+                        statusBound = false;
+                    }
                     textView_StatusBT.setText("Conexion Perdida...handler" );
                     textView_StatusBT_MAC.setText("");
                     mBTaddress=null;
@@ -464,129 +482,132 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                     textView_StatusBT.setText("No se encontraron Dispositivos ...handler");
                     textView_StatusBT_MAC.setText("");
                     break;
+                case STATE_UNBOUND:
+                    if(statusBound){
+                        unbindService(mConnection);
+                        statusBound = false;
+                    }
+                    break;
                 case STATE_TEST:
                     break;
 
                 case STATE_MESSAGE_RECEIVED:
                     //despues
-
                     break;
             }
             return true;
         }
     });
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//    public class ServerConnectThread extends Thread{
-//        private BluetoothSocket bTSocket;
-//
-//        public ServerConnectThread() { }
-//
-//        public void acceptConnect(BluetoothAdapter bTAdapter, UUID mUUID) {
-//            BluetoothServerSocket temp = null;
-//            try {
-//                temp = bTAdapter.listenUsingRfcommWithServiceRecord("Service_Name:Alex139139", mUUID);
-//            } catch(IOException e) {
-//                Log.d("SERVERCONNECT", "Could not get a BluetoothServerSocket:" + e.toString());
-//            }
-//            while(true) {
-//                try {
-//                    bTSocket = temp.accept();
-//                } catch (IOException e) {
-//                    Log.d("SERVERCONNECT", "Could not accept an incoming connection.");
-//                    break;
-//                }
-//                if (bTSocket != null) {
-//                    try {
-//                        temp.close();
-//                    } catch (IOException e) {
-//                        Log.d("SERVERCONNECT", "Could not close ServerSocket:" + e.toString());
-//                    }
-//                    break;
-//                }
-//            }
-//        }
-//
-//        public void closeConnect() {
-//            try {
-//                bTSocket.close();
-//            } catch(IOException e) {
-//                Log.d("SERVERCONNECT", "Could not close connection:" + e.toString());
-//            }
-//        }
-//    }
+    private AdapterView.OnLongClickListener mDeviceLongClickListener =new AdapterView.OnLongClickListener(){
+        @Override
+        public boolean onLongClick(View v) {
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-//    /*private class HiloConexion extends Thread
-//    {
-//        private final BluetoothSocket   socket;         // Socket
-//        private final InputStream       inputStream;    // Flujo de entrada (lecturas)
-//        private final OutputStream      outputStream;   // Flujo de salida (escrituras)
-//
-//        public HiloConexion(BluetoothSocket socket)
-//        {
-//            this.socket = socket;
-//            setName(socket.getRemoteDevice().getName() + " [" + socket.getRemoteDevice().getAddress() + "]");
-//            InputStream tmpInputStream = null;
-//            OutputStream tmpOutputStream = null;
-//            try {
-//                tmpInputStream = socket.getInputStream();
-//                tmpOutputStream = socket.getOutputStream();
-//            }
-//            catch(IOException e){
-//
-//            }
-//            inputStream = tmpInputStream;
-//            outputStream = tmpOutputStream;
-//        }
-//        public void run()
-//        {
-//            byte[] buffer = new byte[1024];
-//            int bytes;
-//
-//            //setEstado(ESTADO_CONECTADO);
-//
-//            // Mientras se mantenga la conexion el hilo se mantiene en espera ocupada
-//            // leyendo del flujo de entrada
-//            while(true)
-//            {
-//                try {
-//                    // Leemos del flujo de entrada del socket
-//                    bytes = inputStream.read(buffer);
-//
-//                    // Enviamos la informacion a la actividad a traves del handler.
-//                    // El metodo handleMessage sera el encargado de recibir el mensaje
-//                    // y mostrar los datos recibidos en el TextView
-//
-//                    //handler.obtainMessage(MSG_LEER, bytes, -1, buffer).sendToTarget();
-//                }
-//                catch(IOException e) {
-//
-//                }
-//            }
-//        }
-//        public void escribir(byte[] buffer)
-//        {
-//            try {
-//                // Escribimos en el flujo de salida del socket
-//                outputStream.write(buffer);
-//
-//                // Enviamos la informacion a la actividad a traves del handler.
-//                // El metodo handleMessage sera el encargado de recibir el mensaje
-//                // y mostrar los datos enviados en el Toast
-//
-//                //handler.obtainMessage(MSG_ESCRIBIR, -1, -1, buffer).sendToTarget();
-//            }
-//            catch(IOException e) {
-//
-//            }
-//        }
-//    }*/
+            handlerBT.obtainMessage(STATE_UNBOUND)
+                    .sendToTarget();
+            Intent intentStopBTService = new Intent(getApplicationContext(), BluetoothService_Test.class);
+            stopService(intentStopBTService);
+            mBTaddress = null;
+            mBTname = null;
 
+            return false;
+        }
+    };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private  AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            String info = ((TextView) view).getText().toString();
+            final String address = info.substring(info.length() - 17);
+            final String name = info.substring(0, info.length() - 17);
+            if (!address.equals(mBTaddress)) {
+                if(!statusBound){
+                    Intent intentBTService = new Intent(BluetoothActivity.this, BluetoothService_Test.class);
+                    bindService(intentBTService,mConnection,BIND_AUTO_CREATE);
+                    statusBound =true;
+                }
+                Intent intentBTService = new Intent(BluetoothActivity.this, BluetoothService_Test.class);
+                intentBTService.putExtra("device_address", address);
+                startService(intentBTService);
 
+            }
+            else Toast.makeText(getBaseContext(), "Dispositivo Conectado", Toast.LENGTH_SHORT).show();
+
+        }
+    };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @SuppressLint("HandlerLeak")
+    private Handler IncomingHandler =new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            //Aqui recibimos los  Mensajes del servicio
+            switch (msg.what){
+                case BluetoothService_Test.RETURN_STATE:
+                    int State = msg.arg2;
+
+                    if(State == BluetoothService_Test.S_STATE_CONNECTED){
+                        statusConnection = true;
+                        Toast.makeText(getApplicationContext(), "hello!"+State, Toast.LENGTH_SHORT).show();
+
+                        Message message2 = Message.obtain(null,BluetoothService_Test.CONNECTED_DEVICE);
+                        message2.replyTo = inMessenger;
+                        try {
+                            mMessenger.send(message2);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else{
+                        statusConnection = false;
+                    }
+                    break;
+                case BluetoothService_Test.CONNECTED_DEVICE:
+                    Bundle bundle = msg.getData();
+                    mBTaddress = bundle.getString("addressDevice");
+                    mBTname = bundle.getString("nameDevice");
+                    handlerBT.obtainMessage(STATE_CONNECTED,mBTname)
+                            .sendToTarget();
+                    handlerBT.obtainMessage(STATE_CONNECTED_MAC,mBTaddress)
+                            .sendToTarget();
+                    break;
+
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
+    Messenger inMessenger =new Messenger(IncomingHandler); //Recive cemnsajes
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mMessenger = new Messenger(service); //Envia Mensajes
+
+            if(statusBound){
+                Message message = Message.obtain(null,BluetoothService_Test.RETURN_STATE,0,0);
+                message.replyTo = inMessenger;
+                try {
+                    mMessenger.send(message);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+            //statusBound = true;
+            //Message message = Message.obtain();
+
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mMessenger = null;
+            //statusBound =false;
+        }
+    };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 }// cierre del activity

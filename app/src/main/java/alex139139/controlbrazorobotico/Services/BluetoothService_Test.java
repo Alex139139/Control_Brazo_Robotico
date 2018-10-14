@@ -3,13 +3,9 @@ package alex139139.controlbrazorobotico.Services;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -18,15 +14,16 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.Process;
+import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.UUID;
 
+import alex139139.controlbrazorobotico.Activities.BluetoothActivity;
+import alex139139.controlbrazorobotico.Activities.MainActivity;
 
 
 public class BluetoothService_Test extends Service {
@@ -49,29 +46,27 @@ public class BluetoothService_Test extends Service {
     public static final int S_STATE_CONNECTION_FAILED = 5;
     public static final int S_STATE_DISCONNECTED = 6;
     //////////////////////////////////////////////////////
-    public static final int RETURN_STATE = 1;
-
     //////////////////////////////////////////////////////
-    public static final String CANONICAL_NAME = BluetoothService_Test.class.getCanonicalName();
+    public int mState;
+    public final static  int RETURN_STATE = 1 ;
+    public final static  int SEND_DATA = 2;
+    public final static  int CONNECTED_DEVICE = 3;
 
-    //public final static String ACTION_BT_SERVICE_NONE = CANONICAL_NAME + ".ACTION_BT_SERVICE_NONE";
-    //public final static String ACTION_BT_SERVICE_CONNECTING = CANONICAL_NAME + "ACTION_BT_SERVICE_CONNECTING";
-    //public final static String ACTION_BT_SERVICE_CONNECTED = CANONICAL_NAME + ".ACTION_BT_SERVICE_CONNECTED";
 
+    public final static  String STRING_RETURN_STATE ="STRING_RETURN_STATE" ;
+    public final static  String STRING_SEND_DATA = "STRING_SEND_DATA";
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
     public final static String ACTION_BT_SERVICE_DISCONNECTED = "BuetoothServisce_Test.ACTION_BT_SERVICE_DISCONNECTED";
     public final static String ACTION_BT_SERVICE_CONNECTING = "BuetoothServisce_Test.ACTION_BT_SERVICE_CONNECTING";
     public final static String ACTION_BT_SERVICE_CONNECTED = "BuetoothServisce_Test.ACTION_BT_SERVICE_CONNECTED";
     public final static String ACTION_BT_SERVICE_CONNECTION_LOST = "BuetoothServisce_Test.ACTION_BT_SERVICE_CONNECTION_LOST";
     public final static String ACTION_BT_SERVICE_CONNECTION_FAILED = "BuetoothServisce_Test.ACTION_BT_SERVICE_CONNECTION_FAILED";
-    public int mState;
-
     //////////////////////////////////////////////////////
-    private ConnectedThread mConnectedThread;
+    public ConnectedThread mConnectedThread;
     private ConnectThread mConnectThread;
-
     //////////////////////////////////////////////////////
-    private Handler mHandler;
-    private Runnable periodicState;
+
     //////////////////////////////////////////////////////
     private static final UUID mBTUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");// "random" unique identifier
     //493489e8-785b-4fa3-8f7f-285bf74bd1e7
@@ -102,31 +97,11 @@ public class BluetoothService_Test extends Service {
                 mBTDevice = mBluetoothAdapter.getRemoteDevice(address);
                 connect(mBTDevice);
 
-               //getState ();
             }
             //se destruye a si mismo
             //boolean stopped =stopSelfResult(starId);
             // stop(starId);
         }
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class MessageHandler extends Handler{
-        public void handleMessage(Message msg){
-            switch (msg.what){
-                case RETURN_STATE:
-                    Toast.makeText(getApplicationContext(),"Estado",Toast.LENGTH_SHORT).show();
-                    break;
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-        }
-    }
-    Messenger messenger = new Messenger(new MessageHandler());
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public IBinder onBind(Intent intent) {
-        return messenger.getBinder();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -169,24 +144,6 @@ public class BluetoothService_Test extends Service {
             mConnectedThread = null;
         }
 
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * Write to the ConnectedThread in an unsynchronized manner
-     *
-     * @param out The bytes to write
-     * @see ConnectedThread#write(byte[])
-     */
-    public void write(byte[] out) {
-        // Create temporary object
-        ConnectedThread r;
-        // Synchronize a copy of the ConnectedThread
-        synchronized (this) {
-            if (mState != S_STATE_CONNECTED) return;
-            r = mConnectedThread;
-        }
-        // Perform the write unsynchronized
-        r.write(out);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public synchronized void stop() {
@@ -318,8 +275,6 @@ public class BluetoothService_Test extends Service {
                 connectionFailed();
                 return;
             }
-
-
         }
 
         public void cancel() {
@@ -351,7 +306,7 @@ public class BluetoothService_Test extends Service {
 //        }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private class ConnectedThread extends Thread{
+    public class ConnectedThread extends Thread{
        // private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
@@ -373,7 +328,6 @@ public class BluetoothService_Test extends Service {
             mmOutStream = temOut;
             mState = S_STATE_CONNECTED;
 
-
             mState = S_STATE_CONNECTED;
             String nameDevice = mBTDevice.getName();
             String nameAddress = mBTDevice.getAddress();
@@ -392,11 +346,10 @@ public class BluetoothService_Test extends Service {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
                     //bytes = mmInStream.available();
-
                     // Send the obtained bytes to the UI Activity
-
                     if(bytes != 0) {
-
+                        //Mensaje recibido
+                        //mServiceHandler.obtainMessage(STATE_MESSAGE_RECIVED,bytes,-1,buffer).sendToTarget();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -405,16 +358,16 @@ public class BluetoothService_Test extends Service {
                 }
             }
         }
-        public void write(byte[] buffer ) {
+        public  void write(byte[] bytes ) {
                     //converts entered String into bytes
             try {
-                mmOutStream.write(buffer);
+                mmOutStream.write(bytes);
                 //mmOutStream.write(bytes);
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                connectionFailed();
+            }
         }
-
         //Call this from the main activity to shutdown the connection
-
         public void cancel() {
             try {
                 mBTSocket.close();
@@ -423,19 +376,88 @@ public class BluetoothService_Test extends Service {
 
             }
         }
-        public boolean cancel_bis() {
-            try {
-                mBTSocket.close();
-                //mBTSocket = null;
-            } catch(IOException e) {
-
-                return false;
-            }
-            return true;
-        }
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Write to the ConnectedThread in an unsynchronized manner
+     *
+     * @param out The bytes to write
+     * @see ConnectedThread#write(byte[])
+     */
+    public  void write(byte[] out) {
+        // Create temporary object
+        ConnectedThread r;
+        // Synchronize a copy of the ConnectedThread
+        synchronized (this) {
+            if (mState != S_STATE_CONNECTED){
+                return;
+            }
+            else{
+                r = mConnectedThread;
+                connectionFailed();
+            }
+        }
+
+        // Perform the write unsynchronized
+        r.write(out);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    class IncomingHandler  extends Handler{
+        @Override
+        public void handleMessage(Message msg){
+            //Sacamos los datos del mensaje
+            //Aqui se ejecutara el metodo de suma y resta creo
+
+            switch (msg.what){
+                case RETURN_STATE:
+                    Toast.makeText(getApplicationContext(), "hello!", Toast.LENGTH_SHORT).show();
+                    outMessenger = msg.replyTo;
+                    Message message =Message.obtain(null,RETURN_STATE,0,mState);
+                    try {
+                        outMessenger.send(message);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case CONNECTED_DEVICE:
+                    String nameDevice = mBTDevice.getName();
+                    String nameAddress = mBTDevice.getAddress();
+
+                    outMessenger = msg.replyTo;
+                    Message message2 = Message.obtain(null,CONNECTED_DEVICE);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("addressDevice",nameAddress);
+                    bundle.putString("nameDevice",nameDevice);
+                    message2.setData(bundle);
+                    try {
+                        outMessenger.send(message2);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case SEND_DATA:
+                    mConnectedThread.write("Hola señora loca".getBytes());
+                    break;
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    }
+    Messenger inMessenger = new Messenger(new IncomingHandler ());        //recibe los mensajes del activity
+
+    private  Messenger outMessenger;                                     //Respuesta resultado de la operacion al activity
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public IBinder onBind(Intent intent) {
+        return inMessenger.getBinder();
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 }
 
 
