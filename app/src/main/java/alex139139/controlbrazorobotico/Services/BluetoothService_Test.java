@@ -51,8 +51,17 @@ public class BluetoothService_Test extends Service {
     public final static  int RETURN_STATE = 1 ;
     public final static  int SEND_DATA = 2;
     public final static  int CONNECTED_DEVICE = 3;
+    //////////////////////////////////////////////////////
+    public final static  int SEND_DATA_M1 = 4;
+    public final static  int SEND_DATA_M2 = 5;
+    public final static  int SEND_DATA_M3 = 6;
+    public final static  int SEND_DATA_M4 = 7;
+    public final static  int SEND_DATA_M5 = 8;
+    public final static  int SEND_DATA_M6 = 9;
 
 
+
+    //////////////////////////////////////////////////////
     public final static  String STRING_RETURN_STATE ="STRING_RETURN_STATE" ;
     public final static  String STRING_SEND_DATA = "STRING_SEND_DATA";
     //////////////////////////////////////////////////////
@@ -412,7 +421,7 @@ public class BluetoothService_Test extends Service {
 
             switch (msg.what){
                 case RETURN_STATE:
-                    Toast.makeText(getApplicationContext(), "hello!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "hello from service!", Toast.LENGTH_SHORT).show();
                     outMessenger = msg.replyTo;
                     Message message =Message.obtain(null,RETURN_STATE,0,mState);
                     try {
@@ -437,9 +446,40 @@ public class BluetoothService_Test extends Service {
                         e.printStackTrace();
                     }
                     break;
+                case SEND_DATA_M1:
+                    int Grados_M1 = msg.arg1;
+                    String Grados = String.valueOf(Grados_M1);
+                    mConnectedThread.write(Grados.getBytes());
+                    break;
+                case SEND_DATA_M2:
+                    int Grados_M2 = msg.arg1;
+                    String Grados2 = String.valueOf(Grados_M2);
+                    mConnectedThread.write(Grados2.getBytes());
+                    break;
+                case SEND_DATA_M3:
+                    int Grados_M3 = msg.arg1;
+                    String Grados3 = String.valueOf(Grados_M3);
+                    mConnectedThread.write(Grados3.getBytes());
+                    break;
+                case SEND_DATA_M4:
+                    int Grados_M4 = msg.arg1;
+                    String Grados4 = String.valueOf(Grados_M4);
+                    mConnectedThread.write(Grados4.getBytes());
+                    break;
+                case SEND_DATA_M5:
+                    int Grados_M5 = msg.arg1;
+                    String Grados5 = String.valueOf(Grados_M5);
+                    mConnectedThread.write(Grados5.getBytes());
+                    break;
+                case SEND_DATA_M6:
+                    int Grados_M6 = msg.arg1;
+                    String Grados6 = String.valueOf(Grados_M6);
+                    mConnectedThread.write(Grados6.getBytes());
+                    break;
                 case SEND_DATA:
                     mConnectedThread.write("Hola señora loca".getBytes());
                     break;
+
                 default:
                     super.handleMessage(msg);
                     break;

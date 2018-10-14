@@ -1,8 +1,15 @@
 package alex139139.controlbrazorobotico.Activities;
 
 
+import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -19,9 +26,6 @@ import alex139139.controlbrazorobotico.Services.BluetoothService_Test;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener,View.OnTouchListener {
 
-
-
-    private BluetoothService_Test mBTService = new BluetoothService_Test(MainActivity.this);
     private String GradosMotor_StringM1 = "179";
     private String GradosMotor_StringM2 = "80";
     private String GradosMotor_StringM3 = "50";
@@ -65,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private Button button_plus_M6;
 
     private Button button_Bluetooth;
+    private Button button;
 
     private boolean AutoIncrement_boolean1 = false; //Incrementar
     private boolean AutoIncrement_boolean2 = false;
@@ -83,7 +88,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private Handler handlerRepetir= new Handler();
 
     //Cosas De Bluetooth-------------------------
-
+    boolean statusBound = false;
+    boolean statusConnection =false;
+    Messenger mMessenger = null;
     //-------------------------------------------
 
     @Override
@@ -121,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         button_plus_M6 = (Button)findViewById(R.id.button6p);
 
         button_Bluetooth = (Button)findViewById(R.id.button_Bluetooth_id);
+        button = (Button)findViewById(R.id.button);
 
 
         editText_M1.setText(GradosMotor_StringM1);
@@ -145,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         button_plus_M6.setOnTouchListener(this);
 
         button_Bluetooth.setOnTouchListener(this);
+        button.setOnTouchListener(this);
 
         button_plus_M1.setOnLongClickListener(this);
         button_plus_M2.setOnLongClickListener(this);
@@ -165,12 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     }//Cierre Funcion onCreate
 
-
-
-
-
-
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     //metodos Para sumar o restar grados
     @Override
     public boolean onLongClick(View v) {
@@ -229,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
         return false;
     }
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch(v.getId()){
@@ -237,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button1m:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M1,GradosMotor_StringM1,GradosMotor_intM1);
-                    GradosMotor_intM1=restaGrados(GradosMotor_intM1,editText_M1);
+                    GradosMotor_intM1=restaGrados(GradosMotor_intM1,editText_M1,BluetoothService_Test.SEND_DATA_M1);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoDecrement_boolean1 = false;
                 }
@@ -245,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button2m:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M2,GradosMotor_StringM2,GradosMotor_intM2);
-                    GradosMotor_intM2=restaGrados(GradosMotor_intM2,editText_M2);
+                    GradosMotor_intM2=restaGrados(GradosMotor_intM2,editText_M2,BluetoothService_Test.SEND_DATA_M2);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoDecrement_boolean2 = false;
                 }
@@ -254,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button3m:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M3,GradosMotor_StringM3,GradosMotor_intM3);
-                    GradosMotor_intM3=restaGrados(GradosMotor_intM3,editText_M3);
+                    GradosMotor_intM3=restaGrados(GradosMotor_intM3,editText_M3,BluetoothService_Test.SEND_DATA_M3);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoDecrement_boolean3 = false;
                 }
@@ -262,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button4m:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M4,GradosMotor_StringM4,GradosMotor_intM4);
-                    GradosMotor_intM4=restaGrados(GradosMotor_intM4,editText_M4);
+                    GradosMotor_intM4=restaGrados(GradosMotor_intM4,editText_M4,BluetoothService_Test.SEND_DATA_M4);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoDecrement_boolean4 = false;
                 }
@@ -270,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button5m:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M5,GradosMotor_StringM5,GradosMotor_intM5);
-                    GradosMotor_intM5=restaGrados(GradosMotor_intM5,editText_M5);
+                    GradosMotor_intM5=restaGrados(GradosMotor_intM5,editText_M5,BluetoothService_Test.SEND_DATA_M5);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoDecrement_boolean5 = false;
                 }
@@ -278,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button6m:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M6,GradosMotor_StringM6,GradosMotor_intM6);
-                    GradosMotor_intM6=restaGrados(GradosMotor_intM6,editText_M6);
+                    GradosMotor_intM6=restaGrados(GradosMotor_intM6,editText_M6,BluetoothService_Test.SEND_DATA_M6);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoDecrement_boolean6 = false;
                 }
@@ -288,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button1p:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M1,GradosMotor_StringM1,GradosMotor_intM1);
-                    GradosMotor_intM1=sumaGrados(GradosMotor_intM1,editText_M1);
+                    GradosMotor_intM1=sumaGrados(GradosMotor_intM1,editText_M1,BluetoothService_Test.SEND_DATA_M1);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoIncrement_boolean1 = false;
                 }
@@ -296,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button2p:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M2,GradosMotor_StringM2,GradosMotor_intM2);
-                    GradosMotor_intM2=sumaGrados(GradosMotor_intM2,editText_M2);
+                    GradosMotor_intM2=sumaGrados(GradosMotor_intM2,editText_M2,BluetoothService_Test.SEND_DATA_M2);
                 }else if(event.getAction() == MotionEvent.ACTION_UP) {
                     AutoIncrement_boolean2 = false;
                 }
@@ -304,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button3p:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M3,GradosMotor_StringM3,GradosMotor_intM3);
-                    GradosMotor_intM3=sumaGrados(GradosMotor_intM3,editText_M3);
+                    GradosMotor_intM3=sumaGrados(GradosMotor_intM3,editText_M3,BluetoothService_Test.SEND_DATA_M3);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoIncrement_boolean3 = false;
                 }
@@ -312,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button4p:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M4,GradosMotor_StringM4,GradosMotor_intM4);
-                    GradosMotor_intM4=sumaGrados(GradosMotor_intM4,editText_M4);
+                    GradosMotor_intM4=sumaGrados(GradosMotor_intM4,editText_M4,BluetoothService_Test.SEND_DATA_M4);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoIncrement_boolean4 = false;
                 }
@@ -320,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button5p:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M5,GradosMotor_StringM5,GradosMotor_intM5);
-                    GradosMotor_intM5=sumaGrados(GradosMotor_intM5,editText_M5);
+                    GradosMotor_intM5=sumaGrados(GradosMotor_intM5,editText_M5,BluetoothService_Test.SEND_DATA_M5);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoIncrement_boolean5 = false;
                 }
@@ -328,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.button6p:
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     comprobarTextEdit(editText_M6,GradosMotor_StringM6,GradosMotor_intM6);
-                    GradosMotor_intM6=sumaGrados(GradosMotor_intM6,editText_M6);
+                    GradosMotor_intM6=sumaGrados(GradosMotor_intM6,editText_M6,BluetoothService_Test.SEND_DATA_M6);
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     AutoIncrement_boolean6 = false;
                 }
@@ -341,33 +345,64 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     startActivity(intent);
                 }
                 break;
+            case R.id.button:
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    if(statusBound){
+                        if(statusConnection){
+                            Message message = Message.obtain(null,BluetoothService_Test.SEND_DATA,0,0);
+                            try {
+                                mMessenger.send(message);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                break;
         }
         return false;
     }
-
-
-
-
-    public int sumaGrados (int GradosMotor_intM, EditText editText_M){
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public int sumaGrados (int GradosMotor_intM, EditText editText_M , int SEND_DATA_X){
         GradosMotor_intM = Integer.parseInt(editText_M.getText().toString());
         if (GradosMotor_intM < 180 ){
             GradosMotor_intM ++;
         }
         editText_M.setText(String.valueOf(GradosMotor_intM));
+        if(statusBound){
+            if(statusConnection){
+                Message message = Message.obtain(null,SEND_DATA_X,GradosMotor_intM,0);
+                try {
+                    mMessenger.send(message);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
 
         return GradosMotor_intM;
     }
-
-
-    public int restaGrados (int GradosMotor_intM, EditText editText_M ){
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public int restaGrados (int GradosMotor_intM, EditText editText_M,int SEND_DATA_X ){
         GradosMotor_intM = Integer.parseInt(editText_M.getText().toString());
         if (GradosMotor_intM > 0 ){
             GradosMotor_intM --;
         }
         editText_M.setText(String.valueOf(GradosMotor_intM));
+        if(statusBound){
+            if(statusConnection){
+                Message message = Message.obtain(null,SEND_DATA_X,GradosMotor_intM,0);
+                try {
+                    mMessenger.send(message);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         return GradosMotor_intM;
     }
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void comprobarTextEdit(EditText editText_M, String GradosMotor_StringM , int GradosMotor_intM){
         String GradosMotor_String;
         if(editText_M.getText().toString().isEmpty()){
@@ -388,74 +423,142 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             }
         }
     }
-
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     class handlerRepetir_class_Suma implements Runnable{
         @Override
         public void run() {
             if(AutoIncrement_boolean1){
-                GradosMotor_intM1=sumaGrados(GradosMotor_intM1,editText_M1);
+                GradosMotor_intM1=sumaGrados(GradosMotor_intM1,editText_M1,BluetoothService_Test.SEND_DATA_M1);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
 
             if(AutoIncrement_boolean2){
-                GradosMotor_intM2=sumaGrados(GradosMotor_intM2,editText_M2);
+                GradosMotor_intM2=sumaGrados(GradosMotor_intM2,editText_M2,BluetoothService_Test.SEND_DATA_M2);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
 
             if(AutoIncrement_boolean3){
-                GradosMotor_intM3=sumaGrados(GradosMotor_intM3,editText_M3);
+                GradosMotor_intM3=sumaGrados(GradosMotor_intM3,editText_M3,BluetoothService_Test.SEND_DATA_M3);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }else
 
             if(AutoIncrement_boolean4){
-                GradosMotor_intM4=sumaGrados(GradosMotor_intM4,editText_M4);
+                GradosMotor_intM4=sumaGrados(GradosMotor_intM4,editText_M4,BluetoothService_Test.SEND_DATA_M4);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
 
             if(AutoIncrement_boolean5){
-                GradosMotor_intM5=sumaGrados(GradosMotor_intM5,editText_M5);
+                GradosMotor_intM5=sumaGrados(GradosMotor_intM5,editText_M5,BluetoothService_Test.SEND_DATA_M5);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
 
             if(AutoIncrement_boolean6){
-                GradosMotor_intM6=sumaGrados(GradosMotor_intM6,editText_M6);
+                GradosMotor_intM6=sumaGrados(GradosMotor_intM6,editText_M6,BluetoothService_Test.SEND_DATA_M6);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
         }
     }
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     class handlerRepetir_class_Resta implements Runnable{
 
         @Override
         public void run() {
             if (AutoDecrement_boolean1){
-                GradosMotor_intM1=restaGrados(GradosMotor_intM1,editText_M1);
+                GradosMotor_intM1=restaGrados(GradosMotor_intM1,editText_M1,BluetoothService_Test.SEND_DATA_M1);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean2){
-                GradosMotor_intM2=restaGrados(GradosMotor_intM2,editText_M2);
+                GradosMotor_intM2=restaGrados(GradosMotor_intM2,editText_M2,BluetoothService_Test.SEND_DATA_M2);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean3){
-                GradosMotor_intM3=restaGrados(GradosMotor_intM3,editText_M3);
+                GradosMotor_intM3=restaGrados(GradosMotor_intM3,editText_M3,BluetoothService_Test.SEND_DATA_M3);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean4){
-                GradosMotor_intM4=restaGrados(GradosMotor_intM4,editText_M4);
+                GradosMotor_intM4=restaGrados(GradosMotor_intM4,editText_M4,BluetoothService_Test.SEND_DATA_M4);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean5){
-                GradosMotor_intM5=restaGrados(GradosMotor_intM5,editText_M5);
+                GradosMotor_intM5=restaGrados(GradosMotor_intM5,editText_M5,BluetoothService_Test.SEND_DATA_M5);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean6){
-                GradosMotor_intM6=restaGrados(GradosMotor_intM6,editText_M6);
+                GradosMotor_intM6=restaGrados(GradosMotor_intM6,editText_M6,BluetoothService_Test.SEND_DATA_M6);
                 handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
             }
 
         }
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onStart(){
+        super.onStart();
+        Intent intentBTService = new Intent(MainActivity.this, BluetoothService_Test.class);
+        bindService(intentBTService,mConnection,BIND_AUTO_CREATE);
+        statusBound = true;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onStop(){
+        super.onStop();
+        if(statusBound){
+            unbindService(mConnection);
+            statusBound = false;
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mMessenger = new Messenger(service); //Envia Mensajes
+
+            if(statusBound){
+                Message message = Message.obtain(null,BluetoothService_Test.RETURN_STATE,0,0);
+                message.replyTo = inMessenger;
+                try {
+                    mMessenger.send(message);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mMessenger = null;
+            //statusBound =false;
+        }
+    };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @SuppressLint("HandlerLeak")
+    private Handler IncomingHandler =new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            //Aqui recibimos los  Mensajes del servicio
+            switch (msg.what){
+                case BluetoothService_Test.RETURN_STATE:
+                    int State = msg.arg2;
+
+                    if(State == BluetoothService_Test.S_STATE_CONNECTED){
+                        statusConnection = true;
+                        //Toast.makeText(getApplicationContext(), "hello!"+State, Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        statusConnection = false;
+                    }
+                    break;
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
+    Messenger inMessenger =new Messenger(IncomingHandler); //Recive cemnsajes
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 }//Cierre Main Activity

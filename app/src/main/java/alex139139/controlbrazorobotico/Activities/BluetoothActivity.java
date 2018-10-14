@@ -112,19 +112,6 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
         ListView_Device.setOnItemClickListener(mDeviceClickListener);
         ListView_DeviceE.setOnItemClickListener(mDeviceClickListener);
         textView_StatusBT.setOnLongClickListener(mDeviceLongClickListener);
-        if(statusBound){
-            Message message = Message.obtain(null,BluetoothService_Test.RETURN_STATE,0,0);
-            message.replyTo = inMessenger;
-            try {
-                mMessenger.send(message);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-
-
 
         if (mArrayAdapter == null) {
             // Device does not support Bluetooth
@@ -149,7 +136,6 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                 public void onClick(View v) {
                     //Intent intent = new Intent(BluetoothActivity.this,MainActivity.class);
                     //startActivity(intent);
-                    int  algo = BluetoothService_Test.SEND_DATA;
                     if(statusBound){
                         if(statusConnection){
                             Message message = Message.obtain(null,BluetoothService_Test.SEND_DATA,0,0);
@@ -169,13 +155,12 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Toast.makeText(this,"Destruido",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"Destruido",Toast.LENGTH_SHORT).show();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onResume() {
         super.onResume();
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -198,7 +183,6 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
             unbindService(mConnection);
             statusBound = false;
         }
-
         //unregisterReceiver(broadcastReceiver); //Al salir de la app ya no recibe los registros
     }
 
@@ -548,7 +532,7 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
 
                     if(State == BluetoothService_Test.S_STATE_CONNECTED){
                         statusConnection = true;
-                        Toast.makeText(getApplicationContext(), "hello!"+State, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "hello from BT Activity!"+State, Toast.LENGTH_SHORT).show();
 
                         Message message2 = Message.obtain(null,BluetoothService_Test.CONNECTED_DEVICE);
                         message2.replyTo = inMessenger;
@@ -593,9 +577,7 @@ public class BluetoothActivity extends AppCompatActivity implements Serializable
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-
             }
-
 
             //statusBound = true;
             //Message message = Message.obtain();
