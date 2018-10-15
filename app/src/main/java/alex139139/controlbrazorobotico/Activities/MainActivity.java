@@ -26,18 +26,18 @@ import alex139139.controlbrazorobotico.Services.BluetoothService_Test;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener,View.OnTouchListener {
 
-    private String GradosMotor_StringM1 = "179";
-    private String GradosMotor_StringM2 = "80";
-    private String GradosMotor_StringM3 = "50";
-    private String GradosMotor_StringM4 = "0";
-    private String GradosMotor_StringM5 = "180";
-    private String GradosMotor_StringM6 = "80";
+    private String GradosMotor_StringM1 = "90";
+    private String GradosMotor_StringM2 = "90";
+    private String GradosMotor_StringM3 = "90";
+    private String GradosMotor_StringM4 = "90";
+    private String GradosMotor_StringM5 = "90";
+    private String GradosMotor_StringM6 = "90";
 
-    private int GradosMotor_intM1 = 179;
-    private int GradosMotor_intM2 = 80;
-    private int GradosMotor_intM3 = 50;
-    private int GradosMotor_intM4 = 0;
-    private int GradosMotor_intM5 = 180;
+    private int GradosMotor_intM1 = 90;
+    private int GradosMotor_intM2 = 90;
+    private int GradosMotor_intM3 = 90;
+    private int GradosMotor_intM4 = 90;
+    private int GradosMotor_intM5 = 90;
     private int GradosMotor_intM6 = 90;
 
     private Switch switch_M1;
@@ -429,32 +429,32 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         public void run() {
             if(AutoIncrement_boolean1){
                 GradosMotor_intM1=sumaGrados(GradosMotor_intM1,editText_M1,BluetoothService_Test.SEND_DATA_M1);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
 
             if(AutoIncrement_boolean2){
                 GradosMotor_intM2=sumaGrados(GradosMotor_intM2,editText_M2,BluetoothService_Test.SEND_DATA_M2);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
 
             if(AutoIncrement_boolean3){
                 GradosMotor_intM3=sumaGrados(GradosMotor_intM3,editText_M3,BluetoothService_Test.SEND_DATA_M3);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }else
 
             if(AutoIncrement_boolean4){
                 GradosMotor_intM4=sumaGrados(GradosMotor_intM4,editText_M4,BluetoothService_Test.SEND_DATA_M4);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
 
             if(AutoIncrement_boolean5){
                 GradosMotor_intM5=sumaGrados(GradosMotor_intM5,editText_M5,BluetoothService_Test.SEND_DATA_M5);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
 
             if(AutoIncrement_boolean6){
                 GradosMotor_intM6=sumaGrados(GradosMotor_intM6,editText_M6,BluetoothService_Test.SEND_DATA_M6);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
         }
     }
@@ -465,27 +465,27 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         public void run() {
             if (AutoDecrement_boolean1){
                 GradosMotor_intM1=restaGrados(GradosMotor_intM1,editText_M1,BluetoothService_Test.SEND_DATA_M1);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean2){
                 GradosMotor_intM2=restaGrados(GradosMotor_intM2,editText_M2,BluetoothService_Test.SEND_DATA_M2);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean3){
                 GradosMotor_intM3=restaGrados(GradosMotor_intM3,editText_M3,BluetoothService_Test.SEND_DATA_M3);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean4){
                 GradosMotor_intM4=restaGrados(GradosMotor_intM4,editText_M4,BluetoothService_Test.SEND_DATA_M4);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean5){
                 GradosMotor_intM5=restaGrados(GradosMotor_intM5,editText_M5,BluetoothService_Test.SEND_DATA_M5);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
             if (AutoDecrement_boolean6){
                 GradosMotor_intM6=restaGrados(GradosMotor_intM6,editText_M6,BluetoothService_Test.SEND_DATA_M6);
-                handlerRepetir.postDelayed(this,100);//se ejecutara cada x mili segundos
+                handlerRepetir.postDelayed(this,75);//se ejecutara cada x mili segundos
             }
 
         }

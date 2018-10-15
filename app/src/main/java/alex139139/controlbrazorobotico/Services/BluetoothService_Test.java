@@ -443,7 +443,7 @@ public class BluetoothService_Test extends Service {
                 case SEND_DATA_M4:
                     int Grados_M4 = msg.arg1;
                     String Grados4 = String.valueOf(Grados_M4);
-                    Grados = "D" + Grados4 + "#";
+                    Grados4 = "D" + Grados4 + "#";
                     mConnectedThread.write(Grados4.getBytes());
                     break;
                 case SEND_DATA_M5:
